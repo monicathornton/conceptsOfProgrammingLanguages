@@ -9,7 +9,7 @@
 # Replace the string value of the following variable with your names.
 my $name = "Monica Thornton";
 # I did not work with a partner on this lab
-#my $partner = "<Replace with your partner's name>";
+# my $partner = "<Replace with your partner's name>";
 
 print "CSCI 305 Lab 1 submitted by $name.\n\n";
 
@@ -18,17 +18,27 @@ if($#ARGV != 0) {
     print STDERR "You must specify the file name as the argument.\n";
     exit 4;
 }
+
 # Opens the file and assign it to handle INFILE
 open(INFILE, $ARGV[0]) or die "Cannot open $ARGV[0]: $!.\n";
 
 # variable definitions
-my $title;     # scalar variable to hold song titles
-my $count;	   # scalar variable to keep track of the number of song titles (for testing purposes)	
-my $word; 	   # scalar variable to keep track of a particular word
-my $index;	   # scalar variable used to iterate through the array 	
-my @words;	   # an array variable containing all of the individual words in a song title 	
-my %hashOfHashes;
-my $hashRef;
+my $title;     		# scalar variable to hold song titles
+my $count;	   		# scalar variable to keep track of the number of song titles (for testing purposes)	
+my $index;	   		# scalar variable used to iterate through the array 	
+my @words;	   		# an array variable containing all of the individual words in a song title 	
+my %bigrams = {};	# a hash variable to hold all of the bigrams created from the text file
+my %frequencyBigrams = {};
+my %bigramWord = {};
+my %frequency = {};
+my %frequency2 = {};
+my $previousWord;
+my $word;
+my $wordPlace;
+my $wordPlace2;
+#my $bigramWord;
+my $previousWord;
+my $innerIndex;
 
 # This loops through each line of the file
 while($line = <INFILE>) {
@@ -187,9 +197,9 @@ while($line = <INFILE>) {
 		#if song titles have all valid characters, accept
 		$title = $title;
 	} else {
-		#if has invalid characters, reject and decrement count
+		# if has invalid characters, reject and decrement count (count commented out, just for testing purposes)
 		$title = "";
-	#	$count--;
+	    #$count--;     
 	}
 	
 	#converts the title text to all lower case characters
@@ -198,46 +208,42 @@ while($line = <INFILE>) {
 	# Prints the song titles - for testing purposes	
 	#print $title;
 	
-	#keep track of word pair counts in a hash of hashes	
-	$hashRef = \%hashOfHashes;
-		foreach (split('\s', $title)){
-			$hashRef->{$_} = {};        
-    		$hashRef = $hashRef->{$_};  
+	#splits the title into a series of words (space delimited), places those words in an array 	
+	@words = split(/\s+/,$title);
+  
+	#MT UPDATE COMMENTS!!!!!!!!!!!!!!!!!!!!!!!!!!
+
+	for ($index = 0; $index < $#words; $index++) {
+		$bigrams[$index] = $words[$index]." ".$words[$index + 1];
+	}
+	
+	for ($index = 0; $index < $#words; $index++) {	
+		if (!exists($frequencyBigrams{$bigrams[$index]})) {
+			$frequencyBigrams{$bigrams[$index]} = 1;
+		} else {
+			$frequencyBigrams{$bigrams[$index]}++;
+		}
+	}
+	
+}      
+
+	foreach $bigrams (sort keys %frequencyBigrams) {
+		@bigrams = split(/\s+/,$bigrams);
+
+		#if ($bigrams[0] eq "love") {	
+		#if ($bigrams[0] eq "sad") {
+		if ($bigrams[0] eq "happy") {
+			++$count;
+			print "$bigrams ----- count $frequencyBigrams{$bigrams} ---- repeat: $count\n";
+
+		}
 	}
 
-	foreach $hashRef (sort keys %hashOfHashes) {
-	       print "$hashref: $hashOfHashes{$hashRef}\n";
-    }
-	
-#	}
-#	for ($index = 0; $index < $#words; $index++) {
-#		if (!exists($frequency_bigrams{$bigrams[$index]})) {
-#			$frequency_bigrams{$bigrams[$index]} = 1;
-#		} else {
-#			$frequency_bigrams{$bigrams[$index]}++;
-#		}
-#	}
-	
-	
-	
-	
-	
 
-	# Prints the number of song titles, for testing purposes
-	#print $count."\n";	
 	
 	
-	#while ( <> ) {
-     #next unless s/^(.*?):\s*//;
-     #$who = $1;
-     #$rec = {};
-     #$HoH{$who} = $rec;
-     #for $field ( split ) {
-     #    ($key, $value) = split /=/, $field;
-     #    $rec->{$key} = $value;
- }
-
-print Dumper \%hashOfHashes;
+  # Prints the number of song titles, for testing purposes
+  #print $count."\n";	
 
  
 # Close the file handle
@@ -255,6 +261,13 @@ chomp($input);
 print "\n";	
 while ($input ne "q"){
 	# Replace these lines with some useful code
+	 
+	
+
+
+	
+	
+	
 	print "Not yet implemented.  Goodbye.\n";
 	$input = 'q';
 }
