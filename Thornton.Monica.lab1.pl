@@ -23,33 +23,24 @@ if($#ARGV != 0) {
 open(INFILE, $ARGV[0]) or die "Cannot open $ARGV[0]: $!.\n";
 
 # variable definitions
-my $title;     		# scalar variable to hold song titles
-my $count;	   		# scalar variable to keep track of the number of song titles (for testing purposes)	
-my $index;	   		# scalar variable used to iterate through the array 	
-my @words;	   		# an array variable containing all of the individual words in a song title 	
-my %bigrams = {};	# a hash variable to hold all of the bigrams created from the text file
-my %frequencyBigrams = {};
-my %bigramWord = {};
-my %frequency = {};
-my %frequency2 = {};
-my $previousWord;
-my $word;
-my $wordPlace;
-my $wordPlace2;
-#my $bigramWord;
-my $previousWord;
-my $innerIndex;
+my $title;     				# scalar variable to hold song titles
+my $count;	   				# scalar variable to keep track of the number of song titles (for testing purposes)	
+my $index;	   				# scalar variable used to iterate through the array 	
+my @words;	   				# an array variable containing all of the individual words in a song title 	
+my %bigrams = {};			# a hash variable to hold all of the bigrams created from the text file
+my %frequencyBigrams = {};	# a hash variable used to hold the frequency with which each of the bigrams occur
 
 # This loops through each line of the file
 while($line = <INFILE>) {
 
-	# This prints each line. You will not want to keep this line.
-	#print $line;
+	# This prints each line - for testing purposes
+	# print $line;
 	
 	# Keeps track of how many song titles there are - for testing purposes - increments for each song title
-	#$count++;
+	# $count++;
 	
-	# The below series of 3 if statements trims the extra information from the song title, leaving just the title
+	# The below series of 3 if statements trims the extra information from the song title using a regex match, 
+	# leaving just the title at the end of the series of ifs
 	# The outermost if trims everything before the first <SEP>, saving the trimmed text from $line in the variable title
 	if($line =~ m/<SEP>(.*?)$/) {
 		$title = $1;		
@@ -63,25 +54,26 @@ while($line = <INFILE>) {
 		}		
 	}
 	
-	# The below series of 14 if statements remove everything after a specified character is found, to remove superfluous text from the title	
-	# Removes everything encountered in the title after a left parenthesis is found
+	# The below series of 14 if statements use a regex match to remove everything after a specified character is found, 
+	# to remove superfluous text from the title	
+	# Removes everything encountered in the title after a left parenthesis is found (left paren is escaped)
 	if ($title =~ m/^(.*?)\(/) {
 		$title = $1."\n";	
 	}
-	# Removes everything encountered in the title after a left bracket is found
+	# Removes everything encountered in the title after a left bracket is found (left bracket is escaped)
 	if ($title =~ m/^(.*?)\[/) {
 		$title = $1."\n";	
 	}
-	# Removes everything encountered in the title after a left curly brace is found
+	# Removes everything encountered in the title after a left curly brace is found (left curly brace is escaped)
 	if ($title =~ m/^(.*?)\{/) {
 		$title = $1."\n";	
 	}	
 
-	# Removes everything encountered in the title after a forward slash is found
+	# Removes everything encountered in the title after a forward slash is found (forward slash is escaped)
 	if ($title =~ m/^(.*?)\\/) {
 		$title = $1."\n";	
 	}		
-	# Removes everything encountered in the title after a back slash is found
+	# Removes everything encountered in the title after a back slash is found (back slash is escaped)
 	if ($title =~ m/^(.*?)\//) {
 		$title = $1."\n";	
 	}	
@@ -106,12 +98,12 @@ while($line = <INFILE>) {
 		$title = $1."\n";	
 	}	
 	
-	# Removes everything encountered in the title after a single left quote is found
+	# Removes everything encountered in the title after a single left quote is found (single quote is escaped)
 	if ($title =~ m/^(.*?)\`/) {
 		$title = $1."\n";	
 	}
 
-	# Removes everything encountered in the title after a plus sign is found
+	# Removes everything encountered in the title after a plus sign is found (plus sign is escaped)
 	if ($title =~ m/^(.*?)\+/) {
 		$title = $1."\n";	
 	}
@@ -121,18 +113,18 @@ while($line = <INFILE>) {
 		$title = $1."\n";	
 	}
 
-	# Removes everything encountered in the title after an asterisk is found
+	# Removes everything encountered in the title after an asterisk is found (asterisk is escaped)
 	if ($title =~ m/^(.*?)\*/) {
 		$title = $1."\n";	
 	}
 
-	# Removes everything encountered in the title after an asterisk is found
+	# Removes everything encountered in the title after the string "feat." is found
 	if ($title =~ m/^(.*?)feat./) {
 		$title = $1."\n";	
 	}
 	
-	# The below series of 12 if statements evaluates the titles for punctuation marks, removes them from the title
-	# Removes any question marks from the title
+	# The below series of 12 if statements evaluates the titles for punctuation marks using a reg ex match, and removes them from the title
+	# Removes any question marks from the title (question mark is escaped)
 	if ($title =~ m/^(.*?)\?/g) {
 		$title =~ s/\?+//g;
 	}
@@ -152,12 +144,12 @@ while($line = <INFILE>) {
 		$title =~ s/¡+//g;
 	}		
 	
-	# Removes any periods from the title
+	# Removes any periods from the title (periods are escaped)
 	if ($title =~ m/^(.*?)\./g) {
 		$title =~ s/\.+//g;
 	}		
 	
-	# Removes any semicolons from the title
+	# Removes any semicolons from the title (semi-colons are escaped)
 	if ($title =~ m/^(.*?)\;/g) {
 		$title =~ s/\;+//g;
 	}		
@@ -167,12 +159,12 @@ while($line = <INFILE>) {
 		$title =~ s/&+//g;
 	}		
 	
-	# Removes any dollar signs from the title
+	# Removes any dollar signs from the title (dollar signs are escaped)
 	if ($title =~ m/^(.*?)\$/g) {
 		$title =~ s/\$+//g;
 	}			
 	
-	# Removes any at symbols from the title
+	# Removes any at symbols from the title (at symbols are escaped)
 	if ($title =~ m/^(.*?)\@/g) {
 		$title =~ s/\@+//g;
 	}			
@@ -187,36 +179,37 @@ while($line = <INFILE>) {
 		$title =~ s/#+//g;
 	}	
 
-	# Removes the pipe from the title
+	# Removes the pipe from the title (pipe is escaped)
 	if ($title =~ m/^(.*?)\|/g) {
 		$title =~ s/\|+//g;
 	}		
 	
-	# Filter out song titles with non-English characters
+	# Filter out song titles with non-English characters using regex matching
 	if ($title =~ m/^[a-zA-Z0-9' ]*$/) {
-		#if song titles have all valid characters, accept
+		#if a song title has all valid characters, accept it
 		$title = $title;
 	} else {
-		# if has invalid characters, reject and decrement count (count commented out, just for testing purposes)
+		# If a song title has invalid (non-English) characters, reject it and decrement the count (count commented out, just for testing purposes)
 		$title = "";
 	    #$count--;     
 	}
 	
-	#converts the title text to all lower case characters
+	# Converts the title text to all lower case characters
 	$title =~ tr/A-Z/a-z/;
 
 	# Prints the song titles - for testing purposes	
-	#print $title;
+	# print $title;
 	
-	#splits the title into a series of words (space delimited), places those words in an array 	
+	# Splits the title into a series of words (space delimited), places those words in an array 	
 	@words = split(/\s+/,$title);
   
-	#MT UPDATE COMMENTS!!!!!!!!!!!!!!!!!!!!!!!!!!
-
+	# Builds a bigram (a series of two adjacent words) for each adjacent word pair using the words in the title
+	# The first for loop loads the bigrams hash with bigrams from the song title
 	for ($index = 0; $index < $#words; $index++) {
 		$bigrams[$index] = $words[$index]." ".$words[$index + 1];
 	}
-	
+	# The second for loop checks to see if the bigram constructed above is already in the hash, and increments accordingly, storing results 
+	# in the frequencyBigrams hash
 	for ($index = 0; $index < $#words; $index++) {	
 		if (!exists($frequencyBigrams{$bigrams[$index]})) {
 			$frequencyBigrams{$bigrams[$index]} = 1;
@@ -224,7 +217,7 @@ while($line = <INFILE>) {
 			$frequencyBigrams{$bigrams[$index]}++;
 		}
 	}
-	
+	#end while
 }      
 
 	foreach $bigrams (sort keys %frequencyBigrams) {
