@@ -26,6 +26,9 @@ open(INFILE, $ARGV[0]) or die "Cannot open $ARGV[0]: $!.\n";
 my $title;     				# scalar variable to hold song titles
 my $count;	   				# scalar variable to keep track of the number of song titles (for testing purposes)	
 my $index;	   				# scalar variable used to iterate through the array 	
+my $input;					# scalar variable used to hold a word entered by the user
+my $titleLength;            # scalar variable used to keep track of the number of words in the song title 
+my $songTitle;			    # scalar variable used to keep track of a song title that we will construct using the bigrams  
 my @words;	   				# an array variable containing all of the individual words in a song title 	
 my %bigrams = {};			# a hash variable to hold all of the bigrams created from the text file
 my %frequencyBigrams = {};	# a hash variable used to hold the frequency with which each of the bigrams occur
@@ -220,49 +223,122 @@ while($line = <INFILE>) {
 	#end while
 }      
 
-	foreach $bigrams (sort keys %frequencyBigrams) {
-		@bigrams = split(/\s+/,$bigrams);
+ # Prints the number of song titles, for testing purposes
+ #print $count."\n";	
 
-		#if ($bigrams[0] eq "love") {	
-		#if ($bigrams[0] eq "sad") {
-		if ($bigrams[0] eq "happy") {
-			++$count;
-			print "$bigrams ----- count $frequencyBigrams{$bigrams} ---- repeat: $count\n";
+ # Close the file handle
+ close INFILE; 
 
+ # Song title file processed, and data structure populated with bigrams and bigram counts. Prints message for user to let them know.
+ print "File parsed. Bigram model built.\n\n";
+
+ # User control loop
+ print "Enter a word [Enter 'q' to quit]: ";
+ # Saves the user entered word into a variable named input
+ $input = <STDIN>;
+ # remove the 
+ chomp($input);
+ print "\n";
+ # Run the below loop while the user has not indicated that they would like to quit by entering q
+ while ($input ne "q"){
+	# As there are no words in the constructed song title yet, sets this variable equal to 0
+	$titleLength = 0;
+	# As there are no words in the constructed song title yet, sets this variable equal to the empty string
+	$songTitle = "";
+	
+	# If the probable song title we are constructing contains no words, take the following steps
+	if ($titleLength == 0) {
+		# Store the result of the mcw function (which gets the most common word following the word $input) in a variable
+		$bigramWord = mcw($input);
+		# Use that variable, along with the input value from the user, to construct the first two words of your title
+		$songTitle = $input." ".$bigramWord;
+		# Increment the length of the title string twice, to account for both the input word and its matching bigram word
+		$titleLength++;	
+		$titleLength++;
+	}
+	
+	# Keeps adding words up to the song title, up to the cap of 20 words in the title (indexing starts at 0)
+	while($titleLength <= 19) {
+		# If the result of using the most common word function on the current value of the bigramWord variable is not the empty string 
+		if (mcw($bigramWord) ne ""){
+			# Append the new value returned from most common word function to the existing song title
+			$songTitle = $songTitle." ".mcw($bigramWord);
+			# Update the value of the bigram word variable
+			$bigramWord = mcw($bigramWord);
+			# Increment the length of the title string
+			$titleLength++;	
+		} else {
+		# If the result of using the most common word function was the empty string, decrement the length of the title by one  
+			$titleLength--;
+			# Break out of the while loop
+			last;
 		}
 	}
-
-
+	# Print the song title
+	print "$songTitle\n";
+	# Gets the count of the number of words in the song title - for testing purposes 
+	# print "The song is $titleLength word(s) long\n";
 	
+	# A function to take a word as an argument, and return the word that most follows the chosen word in the dataset
+	sub mcw() 
+	{
+		# The argument for the function, provided at the function call
+		my $inputWord = $_[0];
+		
+		# A variable to keep track of the largest number of times a bigram appears (with the first word of the bigram given by $inputWord),
+		# initialized to 0, so that the first time a value greater than 0 is encountered, the appropriate if branch is taken
+		$biggestNumOccurences = 0;
 	
-  # Prints the number of song titles, for testing purposes
-  #print $count."\n";	
+			# Goes through every bigram in the hash of hashes 
+			foreach $bigrams (sort keys %frequencyBigrams) {
+				# Splits the bigrams into individual words, stored as an array
+				@bigrams = split(/\s+/,$bigrams);
+				
+				# Checks if the first word of the bigram is equal to the input word, if so, examines the word following the input word
+				if ($bigrams[0] eq $inputWord) {
+					# Keeps track of the number of bigrams beginning with the input word - for testing purposes
+					# ++$count;
+					
+					# Stores the second word of the bigram in the variable nextWord
+					$nextWord = $bigrams[1];
+				# Prints the entire list of bigrams for the given word - for testing purposes
+				# print "the nextWord is $nextWord which occurs $frequencyBigrams{$bigrams} times\n";	
 
- 
-# Close the file handle
-close INFILE; 
-
-# At this point (hopefully) you will have finished processing the song 
-# title file and have populated your data structure of bigram counts.
-print "File parsed. Bigram model built.\n\n";
-
-
-# User control loop
-print "Enter a word [Enter 'q' to quit]: ";
-$input = <STDIN>;
-chomp($input);
-print "\n";	
-while ($input ne "q"){
-	# Replace these lines with some useful code
-	 
+					# If the number of times the bigram occurs is larger than the previously largest bigram
+					if ($frequencyBigrams{$bigrams} > $biggestNumOccurences) {
+						# Mark the second word of this bigram as the most frequent
+						$mostFrequentNextWord = $nextWord;
+						# Make the number of occurrences the new biggest
+						$biggestNumOccurences = $frequencyBigrams{$bigrams};
+					} # If the number of times the bigram occurs is equal to the currently largest bigram 
+					 elsif ($frequencyBigrams{$bigrams} == $biggestNumOccurences) {
+						my $range = 10;
+						# Gets a random integer from the range set in the variable above
+               	        my $random_number = int(rand($range));
+						# If this integer is greater than or equal to 4, consider this the most frequently occurring bigram
+						if ($randomNumber >= 4) {
+							$mostFrequentNextWord = $nextWord;					
+						} 
+						# If the integer is greater than 4, leave the most frequently occuring bigram as it was originally, do not reset 
+					}
+				}	
+			}
+			
+		
+		# The following 3 print statements print out information on the bigrams - for testing purposes 
+		# print "bigrams for $input \n";
+		# print "the most frequent next word is ---$mostFrequentNextWord --- which occurs --- $biggestNumOccurences --- times\n";
+		# print "$inputWord has $count bigrams\n";
+		return $mostFrequentNextWord;
+		#end mcw function
+	}
 	
-
-
-	
-	
-	
+	#}
+	#MONICA HERE!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
+	#add print line for if word not in dataset??????????????????????????????????????????????????????????????????????????
 	print "Not yet implemented.  Goodbye.\n";
 	$input = 'q';
-}
+
 
 # MORE OF YOUR CODE HERE....
+}
