@@ -29,7 +29,8 @@ my $index;	   				# scalar variable used to iterate through the array
 my $input;					# scalar variable used to hold a word entered by the user
 my $titleLength;            # scalar variable used to keep track of the number of words in the song title 
 my $songTitle;			    # scalar variable used to keep track of a song title that we will construct using the bigrams  
-my @words;	   				# an array variable containing all of the individual words in a song title 	
+my @words;	   				# an array variable containing all of the individual words in a song title 
+my @stopWords;				# an array variable containing all of the stop words	
 my %bigrams = {};			# a hash variable to hold all of the bigrams created from the text file
 my %frequencyBigrams = {};	# a hash variable used to hold the frequency with which each of the bigrams occur
 
@@ -199,10 +200,13 @@ while($line = <INFILE>) {
 	
 	# Converts the title text to all lower case characters
 	$title =~ tr/A-Z/a-z/;
-
+	
 	# Prints the song titles - for testing purposes	
 	# print $title;
 	
+	# Remove the specified stop words using regex substitution on word boundaries
+	$title =~ s/\b(?:a|an|and|by|for|from|in|of|on|or|out|the|to|with)\b//g;
+
 	# Splits the title into a series of words (space delimited), places those words in an array 	
 	@words = split(/\s+/,$title);
   
@@ -236,7 +240,7 @@ while($line = <INFILE>) {
  print "Enter a word [Enter 'q' to quit]: ";
  # Saves the user entered word into a variable named input
  $input = <STDIN>;
- # remove the 
+ # remove the newline character
  chomp($input);
  print "\n";
  # Run the below loop while the user has not indicated that they would like to quit by entering q
@@ -275,10 +279,24 @@ while($line = <INFILE>) {
 		}
 	}
 	# Print the song title
-	print "$songTitle\n";
+	print "Probable song title given the word $input: \n$songTitle\n";
+	
 	# Gets the count of the number of words in the song title - for testing purposes 
 	# print "The song is $titleLength word(s) long\n";
 	
+	# User control loop
+	print "\nEnter a word [Enter 'q' to quit]: ";
+	# Saves the user entered word into a variable named input
+	$input = <STDIN>;
+	# remove the newline character
+	chomp($input);
+	print "\n";
+	
+	}
+	# Prints the message that they are leaving the program 
+	print "You have chosen to quit the program.  Goodbye.\n";
+
+
 	# A function to take a word as an argument, and return the word that most follows the chosen word in the dataset
 	sub mcw() 
 	{
@@ -332,13 +350,3 @@ while($line = <INFILE>) {
 		return $mostFrequentNextWord;
 		#end mcw function
 	}
-	
-	#}
-	#MONICA HERE!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
-	#add print line for if word not in dataset??????????????????????????????????????????????????????????????????????????
-	print "Not yet implemented.  Goodbye.\n";
-	$input = 'q';
-
-
-# MORE OF YOUR CODE HERE....
-}
