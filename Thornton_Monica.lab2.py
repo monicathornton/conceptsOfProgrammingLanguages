@@ -31,7 +31,7 @@ class Element (object):
 
     """An abstract method to compare Elements, to determine the win status/method of winning when pitted against eachother.
     Each subclass will override this method in different ways, and we will not be comparing Element objects to eachother directly,
-    so we throw an exception if someone tries to compare two Element objects directly. """
+    so we throw an exception if someone tries to compare two Element objects directly."""
     def compareTo(self, element):
          raise NotImplementedError("Not yet implemented")
 
@@ -45,7 +45,7 @@ class Rock (Element):
     def __init__(self,name):
         super(Rock,self).__init__("Rock")
 
-    #Overrides the compareTo method inherited from element, with all the particular win/loss info for this Element     
+    #Overrides the compareTo method inherited from Element, with all the particular win/loss info for this Element     
     def compareTo(self, Element):
         #A winning case, represents the case when Rock (the self parameter) is played against Lizard(the Element parameter)
         if (Element.name() == "Lizard"):
@@ -77,7 +77,7 @@ class Paper (Element):
     def __init__(self,name):
         super(Paper,self).__init__("Paper")
 
-    #Overrides the compareTo method inherited from element, with all the particular win/loss info for this element              
+    #Overrides the compareTo method inherited from Element, with all the particular win/loss info for this Element              
     def compareTo(self, Element):
         #A winning case, represents the case when Paper (the self parameter) is played against Rock (the Element parameter)
         if (Element.name() == "Rock"):
@@ -109,7 +109,7 @@ class Scissors (Element):
     def __init__(self,name):
         super(Scissors,self).__init__("Scissors")
 
-    #Overrides the compareTo method inherited from element, with all the particular win/loss info for this element            
+    #Overrides the compareTo method inherited from Element, with all the particular win/loss info for this Element            
     def compareTo(self, Element):
         #A winning case, represents the case when Scissors (the self parameter) is played against Paper (the Element parameter)
         if (Element.name() == "Paper"):
@@ -141,7 +141,7 @@ class Lizard (Element):
     def __init__(self,name):
         super(Lizard,self).__init__("Lizard")
 
-    #Overrides the compareTo method inherited from element, with all the particular win/loss info for this element           
+    #Overrides the compareTo method inherited from Element, with all the particular win/loss info for this Element           
     def compareTo(self, Element):
         #A winning case, represents the case when Lizard (the self parameter) is played against Spock (the Element parameter)
         if (Element.name() == "Spock"):
@@ -173,7 +173,7 @@ class Spock (Element):
     def __init__(self,name):
         super(Spock,self).__init__("Spock")
         
-    #Overrides the compareTo method inherited from element, with all the particular win/loss info for this element            
+    #Overrides the compareTo method inherited from Element, with all the particular win/loss info for this Element            
     def compareTo(self, Element):
         #A winning case, represents the case when Spock (the self parameter) is played against Scissors (the Element parameter)
         if (Element.name() == "Scissors"):
@@ -185,7 +185,7 @@ class Spock (Element):
 
         #Tie case, where both players throw Spock 
         if (self.name() == Element.name()):
-            return (self.name() + " equals " + Element.name() + " - MIND MELD!!!", "Tie")  
+            return (self.name() + " equals " + Element.name() + " - MIND MELD!", "Tie")  
 
         #A losing case, represents the case when Spock (the self parameter) is played against Paper (the Element parameter) 
         if (Element.name() == "Paper"):
@@ -211,15 +211,14 @@ def moves_list():
     #Constructs a list of all possible moves a player could throw, saves it in the (global) variable moves 
     moves = [rock, paper, scissors, lizard, spock]
 
-#Calls the moves list function, so the moves are instantiated and stored in a list
-moves_list()
-
-"""COMMENt HERE DOWN!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!"""
+"""A superclass that the six subclasses StupidBot, RandomBot, IterativeBot, LastPlayBot, HumanBot and MyBot all inherit from"""
 class Player (object):
     #an instance variable to store the name of each Player
     _name = ""
 
-    """Comment this!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!"""
+    """A constructor for the Player class, which not only builds a Player, but will be used to specify a name
+     in the subclasses(i.e. StupidBot, RandomBot, IterativeBot, et al). Because we are not instantiating any Element objects directly,
+     name is an empty string in this class, and is overridden in the subclasses"""
     def __init__(self, _name):
          self._name = _name
 
@@ -227,32 +226,106 @@ class Player (object):
     def name(self):
          return self._name
 
-    """Comment this!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!Is self right param?"""
+    """An abstract method to specify the different move strategies for each of the Player subclasses. Each subclass will override this method in
+    different ways, and we will not be playing with Player objects directly, so we throw an exception if someone tries to
+    play with the Player object directly."""
     def play(self):
          raise NotImplementedError("Not yet implemented")
 
-
+"""A subclass to represent the StupidBot player, which plays the same move every time. In the spirit of the Big Bang Theory,
+   StupidBot plays Spock every time."""
 class StupidBot (Player):
+    #The name instance variable from Player is overriden, and its value set to StupidBot
     _name = "Stupid Bot"
 
+    #Constructor to build StupidBot players
     def __init__(self,name):
         super(StupidBot,self).__init__("Stupid Bot")
-    
+        
+    #Overrides the play method inherited from Player, with the play the same move every time strategy implemented    
     def play(self):
-        return moves[0]
+        #plays Spock for every move 
+        return moves[4]
+
+"""DONE TO HERE - COMMENT AND UPDATE EVERYTHING BELOW!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!"""
+class RandomBot (Player):
+    #The name instance variable from Player is overriden, and its value set to RandomBot
+    _name = "Random Bot"
+
+    #Constructor to build StupidBot players
+    def __init__(self,name):
+        super(RandomBot,self).__init__("Random Bot")
+        
+    """Overrides the play method inherited from Player, with the Random move strategy implemented. In this strategy, a move is picked at random from
+    our moves list and played."""    
+    def play(self):
+        import random
+
+        #Generate a random number between 0 and 4, save it in the variable randomMove
+        randomMove = random.randint(0, 4)
+        
+        #Use randomMove variable to get a move from the moves list
+        return moves[randomMove]
+          
+#Calls the moves list function, so the moves are instantiated and stored in a list
+moves_list()
 
 p1 = StupidBot('Stupid Bot')
 p1move = p1.play()
-p2 = StupidBot('Stupid Bot')
+p2 = RandomBot('Random Bot')
 p2move = p2.play()
 
-print(p1.name())
-print(moves[0].name())
 print (p1move.compareTo(p2move))
- 
+
+p1 = StupidBot('Stupid Bot')
+p1move = p1.play()
+p2 = RandomBot('Random Bot')
+p2move = p2.play()
+
+print (p1move.compareTo(p2move))
+
+p1 = StupidBot('Stupid Bot')
+p1move = p1.play()
+p2 = RandomBot('Random Bot')
+p2move = p2.play()
+print (p1move.compareTo(p2move))
+
+p1 = StupidBot('Stupid Bot')
+p1move = p1.play()
+p2 = RandomBot('Random Bot')
+p2move = p2.play()
+print (p1move.compareTo(p2move))
 
 
+p1 = StupidBot('Stupid Bot')
+p1move = p1.play()
+p2 = RandomBot('Random Bot')
+p2move = p2.play()
+print (p1move.compareTo(p2move))
 
+p1 = StupidBot('Stupid Bot')
+p1move = p1.play()
+p2 = RandomBot('Random Bot')
+p2move = p2.play()
+print (p1move.compareTo(p2move))
+
+p1 = StupidBot('Stupid Bot')
+p1move = p1.play()
+p2 = RandomBot('Random Bot')
+p2move = p2.play()
+print (p1move.compareTo(p2move))
+
+p1 = StupidBot('Stupid Bot')
+p1move = p1.play()
+p2 = RandomBot('Random Bot')
+p2move = p2.play()
+print (p1move.compareTo(p2move))
+
+p1 = StupidBot('Stupid Bot')
+p1move = p1.play()
+p2 = RandomBot('Random Bot')
+p2move = p2.play()
+print (p1move.compareTo(p2move))
 
 
 
