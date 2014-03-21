@@ -230,3 +230,29 @@ class Player (object):
     """Comment this!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!Is self right param?"""
     def play(self):
          raise NotImplementedError("Not yet implemented")
+
+
+class StupidBot (Player):
+    _name = "Stupid Bot"
+
+    def __init__(self,name):
+        super(StupidBot,self).__init__("Stupid Bot")
+    
+    def play(self):
+        return moves[0]
+
+p1 = StupidBot('Stupid Bot')
+p1move = p1.play()
+p2 = StupidBot('Stupid Bot')
+p2move = p2.play()
+
+print(p1.name())
+print(moves[0].name())
+print (p1move.compareTo(p2move))
+ 
+
+
+
+
+
+
