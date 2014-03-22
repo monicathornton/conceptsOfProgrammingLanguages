@@ -9,6 +9,8 @@
 # the chance of a tie.
 #########################################
 
+import random
+
 #String variable indicating my name.
 #I did not work with a partner on this lab
 myName = "Monica Thornton"
@@ -247,85 +249,137 @@ class StupidBot (Player):
         #plays Spock for every move 
         return moves[4]
 
-"""DONE TO HERE - COMMENT AND UPDATE EVERYTHING BELOW!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!"""
+"""A subclass to represent the RandomBot player, which plays a random move every time."""
 class RandomBot (Player):
     #The name instance variable from Player is overriden, and its value set to RandomBot
     _name = "Random Bot"
 
-    #Constructor to build StupidBot players
+    #Constructor to build RandomBot players
     def __init__(self,name):
         super(RandomBot,self).__init__("Random Bot")
         
     """Overrides the play method inherited from Player, with the Random move strategy implemented. In this strategy, a move is picked at random from
     our moves list and played."""    
     def play(self):
-        import random
 
         #Generate a random number between 0 and 4, save it in the variable randomMove
         randomMove = random.randint(0, 4)
         
         #Use randomMove variable to get a move from the moves list
         return moves[randomMove]
-          
+
+"""A subclass to represent the IterativeBot player, which iterates through the move list to choose its move. Once it has gone through
+the entire move list, it starts again."""
+class IterativeBot (Player):
+    #The name instance variable from Player is overriden, and its value set to IterativeBot
+    _name = "Iterative Bot"
+
+    #Constructor to build IterativeBot players
+    def __init__(self,name):
+        super(IterativeBot,self).__init__("Iterative Bot")
+        
+    """Overrides the play method inherited from Player, with the Iterative move strategy implemented. In this strategy, a move is picked from
+    the moves list and played, and the move immediately preceding it is picked for our next move."""    
+    def play(self):
+        #Tells the method that the variable iterativeCounter is global
+        global iterativeCounter
+
+        #location is a local variable to keep track of where we are in the moves list, we set it equal to the value in iterativeCounter
+        location = iterativeCounter
+
+        #If location is greater than 4 (because we have 5 moves total and moves is 0 indexed), we start back at the beginning of the list
+        if location > 4:
+            #Sets the location back to 0 (the beginning of the list)
+            location = 0
+            #increments iterativeCounter, so the next time we loop through it - iterativeCounter is in the right place
+            iterativeCounter = location + 1
+        else:
+            #If location is not greater than 4, we increment the iterative counter, but leave location untouched
+            iterativeCounter = iterativeCounter + 1
+
+        #Return the appropriate member of the moves list to the calling function
+        return moves[location]
+            
+"""A subclass to represent the LastPlayBot player, which chooses its move based on the last move the opponent played."""
+class LastPlayBot (Player):
+    #The name instance variable from Player is overriden, and its value set to LastPlayBot
+    _name = "Last Play Bot"
+
+    #A global variable to store the opponent's last move - initialized to None in case opponent has not moved yet
+    global opponentMove
+    opponentMove = None
+
+
+    #Constructor to build LastPlayBot players
+    def __init__(self,name):
+        super(LastPlayBot,self).__init__("Last Play Bot")
+        
+    """Overrides the play method inherited from Player, with the Last Play move strategy implemented. In this strategy, the initial move is chosen randomly,
+    and after that moves are picked based on the last move played by the opponent."""
+    def play(self):
+        #If first move of round (ergo, opponent has not moved yet), play random move
+        if opponentMove is None:
+
+            #Generate a random number between 0 and 4, save it in the variable randomMove
+            randomMove = random.randint(0, 4)
+            
+            #Use randomMove variable to get a move from the moves list
+            return moves[randomMove]
+        
+        else:
+            #If your opponent has already moved, play their move from last turn for this turn
+            return opponentMove
+
+"""A subclass to represent the Human player, in which the series of moves are determined by the Human player."""
+class Human (Player):
+    #The name instance variable from Player is overriden, and its value set to Human
+    _name = "Human"
+
+    #Constructor to build IterativeBot players
+    def __init__(self,name):
+        super(Human,self).__init__("Human")
+        
+    """Overrides the play method inherited from Player, with the Human player picking the moves."""    
+    def play(self):
+        print("(1) : Rock")
+        print("(2) : Paper")
+        print("(3) : Scissors")        
+        print("(4) : Lizard")
+        print("(5) : Spock")        
+        print("Enter your move: ")
+        
+        
+        
+        return moves[0]
+
+
+
+                  
 #Calls the moves list function, so the moves are instantiated and stored in a list
 moves_list()
 
-p1 = StupidBot('Stupid Bot')
-p1move = p1.play()
-p2 = RandomBot('Random Bot')
-p2move = p2.play()
-
-print (p1move.compareTo(p2move))
-
-p1 = StupidBot('Stupid Bot')
-p1move = p1.play()
-p2 = RandomBot('Random Bot')
-p2move = p2.play()
-
-print (p1move.compareTo(p2move))
-
-p1 = StupidBot('Stupid Bot')
-p1move = p1.play()
-p2 = RandomBot('Random Bot')
-p2move = p2.play()
-print (p1move.compareTo(p2move))
-
-p1 = StupidBot('Stupid Bot')
-p1move = p1.play()
-p2 = RandomBot('Random Bot')
-p2move = p2.play()
-print (p1move.compareTo(p2move))
+#A global variable to keep track of the location in the moves list, for use with the Iterative Bot
+global iterativeCounter
+#Sets iterativeCounter to 0, which is the start of the moves list
+iterativeCounter = 0
 
 
 p1 = StupidBot('Stupid Bot')
 p1move = p1.play()
-p2 = RandomBot('Random Bot')
+p2 = Human('Human')
 p2move = p2.play()
 print (p1move.compareTo(p2move))
 
-p1 = StupidBot('Stupid Bot')
-p1move = p1.play()
-p2 = RandomBot('Random Bot')
-p2move = p2.play()
-print (p1move.compareTo(p2move))
+opponentMove = p2move
 
-p1 = StupidBot('Stupid Bot')
-p1move = p1.play()
-p2 = RandomBot('Random Bot')
-p2move = p2.play()
-print (p1move.compareTo(p2move))
 
-p1 = StupidBot('Stupid Bot')
-p1move = p1.play()
-p2 = RandomBot('Random Bot')
-p2move = p2.play()
-print (p1move.compareTo(p2move))
 
-p1 = StupidBot('Stupid Bot')
-p1move = p1.play()
-p2 = RandomBot('Random Bot')
-p2move = p2.play()
-print (p1move.compareTo(p2move))
+
+
+
+
+
+
 
 
 
