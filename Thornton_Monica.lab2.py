@@ -281,25 +281,72 @@ class IterativeBot (Player):
     """Overrides the play method inherited from Player, with the Iterative move strategy implemented. In this strategy, a move is picked from
     the moves list and played, and the move immediately preceding it is picked for our next move."""    
     def play(self):
-        #Tells the method that the variable iterativeCounter is global
-        global iterativeCounter
+        #Specifies that the below variables are global, used to keep track of where we are iteratively for p1 and p2
+        global p1IterativeCounter
+        global p2IterativeCounter
 
-        #location is a local variable to keep track of where we are in the moves list, we set it equal to the value in iterativeCounter
-        location = iterativeCounter
+        #Specifies that the below variables are global, used to specify/differentiate between p1 and p2
+        global p1
+        global p2
 
-        #If location is greater than 4 (because we have 5 moves total and moves is 0 indexed), we start back at the beginning of the list
-        if location > 4:
-            #Sets the location back to 0 (the beginning of the list)
-            location = 0
-            #increments iterativeCounter, so the next time we loop through it - iterativeCounter is in the right place
-            iterativeCounter = location + 1
-        else:
-            #If location is not greater than 4, we increment the iterative counter, but leave location untouched
-            iterativeCounter = iterativeCounter + 1
+        #Allows for the case that both p1 and p2 are Iterative Bot players, so the correct global variables are updated        
+        if p1.name() == "Iterative Bot" and p2.name() == "Iterative Bot":
+        #If they will both need to be updated, this is for the case in which p1 is self    
+            if self == p1:
+                #location is a local variable to keep track of where we are in the moves list, we set it equal to the value in p1IterativeCounter
+                location = p1IterativeCounter
 
+                #If location is greater than 4 (because we have 5 moves total and moves is 0 indexed), we start back at the beginning of the list
+                if location > 4:
+                    location = 0
+                    #increments p1IterativeCounter, so the next time we loop through it - p1IterativeCounter is in the right place
+                    p1IterativeCounter = location + 1
+                else:
+                    #If location is not greater than 4, update to the next move in the moves list
+                    p1IterativeCounter = p1IterativeCounter + 1
+
+            #If they will both need to be updated, this is for the case in which p2 is self                    
+            elif self == p2:
+                #location is a local variable to keep track of where we are in the moves list, we set it equal to the value in p2IterativeCounter
+                location = p2IterativeCounter
+
+                #If location is greater than 4 (because we have 5 moves total and moves is 0 indexed), we start back at the beginning of the list
+                if location > 4:
+                    location = p2IterativeCounter
+                    location = 0
+                    #increments p1IterativeCounter, so the next time we loop through it - p2IterativeCounter is in the right place
+                    p2IterativeCounter = location + 1
+                else:
+                    #If location is not greater than 4, update to the next move in the moves list
+                    p2IterativeCounter = p2IterativeCounter + 1
+                    
+        #Allows for the case that just p1 is an Iterative Bot player, so the correct global variables are updated                      
+        elif p1.name() == "Iterative Bot" and p2.name() != "Iterative Bot":
+            location = p1IterativeCounter
+            if location > 4:
+                #Sets the location back to 0 (the beginning of the list)
+                location = 0
+                #increments p1IterativeCounter, so the next time we loop through it - p1IterativeCounter is in the right place
+                p1IterativeCounter = location + 1
+            else:
+                #If location is not greater than 4, we increment the iterative counter, but leave location untouched
+                p1IterativeCounter = p1IterativeCounter + 1
+        #Allows for the case that just p2 is an Iterative Bot player, so the correct global variables are updated        
+        elif p2.name() == "Iterative Bot" and p1.name() != "Iterative Bot":
+            location = p2IterativeCounter
+            #If location is greater than 4 (because we have 5 moves total and moves is 0 indexed), we start back at the beginning of the list            
+            if location > 4:
+                #Sets the location back to 0 (the beginning of the list)
+                location = 0
+                #increments p2IterativeCounter, so the next time we loop through it - p2IterativeCounter is in the right place
+                p2IterativeCounter = location + 1
+            else:
+                #If location is not greater than 4, we increment the iterative counter, but leave location untouched
+                p2IterativeCounter = p2IterativeCounter + 1
+        
         #Return the appropriate member of the moves list to the calling function
-        return moves[location]
-            
+        return moves[location]            
+               
 """A subclass to represent the LastPlayBot player, which chooses its move based on the last move the opponent played."""
 class LastPlayBot (Player):
     #The name instance variable from Player is overriden, and its value set to LastPlayBot
@@ -338,19 +385,56 @@ class Human (Player):
     #Constructor to build IterativeBot players
     def __init__(self,name):
         super(Human,self).__init__("Human")
-        
+
+    
     """Overrides the play method inherited from Player, with the Human player picking the moves."""    
     def play(self):
+        #Prints the menu of options for the human player
         print("(1) : Rock")
         print("(2) : Paper")
         print("(3) : Scissors")        
         print("(4) : Lizard")
-        print("(5) : Spock")        
-        print("Enter your move: ")
-        
-        
-        
-        return moves[0]
+        print("(5) : Spock")
+
+        #Sets up a list with all of the valid choices, so we can make sure the user picks one  
+        validChoices = [1, 2, 3, 4, 5]
+
+        #Loop to make sure that the input is one of the valid choices
+        while True:
+            #Casts the user choice as an integer value
+            userChoice = int(input("Enter your move: "))
+            #Checks if the user choice is valid
+            if userChoice in validChoices:
+                #If userChoice is a valid entry, subtract one from the value (because moves is 0 indexed)
+                userChoice = userChoice - 1
+                #We have adjusted our valid user choice, so break out of the loop
+                break
+            else:
+                #If user choice is invalid, print a message to a user and continue to loop
+                print("Invalid move. Please try again.")                
+
+        #Return the Human choice to the calling function    
+        return moves[userChoice]  
+
+"""DONE TO HERE!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!"""
+class MyBot (Player):
+    #The name instance variable from Player is overriden, and its value set to Human
+    _name = "MyBot"
+
+    #Constructor to build IterativeBot players
+    def __init__(self,name):
+        super(MyBot,self).__init__("MyBot")
+
+    
+    """Overrides the play method inherited from Player, with the Human player picking the moves."""    
+    def play(self):
+            
+        return moves[0]  
+
+
+
+
+
 
 
 
@@ -358,22 +442,52 @@ class Human (Player):
 #Calls the moves list function, so the moves are instantiated and stored in a list
 moves_list()
 
+#NOTE TO MONICA --------------------------------------------------------- SHOULD REALLY DO P1 AND P2 AS SEPARATE ITERATIVE BOTS!!!!!!!!!!!!!!!!!
 #A global variable to keep track of the location in the moves list, for use with the Iterative Bot
-global iterativeCounter
+global p1IterativeCounter
+global p2IterativeCounter
+
 #Sets iterativeCounter to 0, which is the start of the moves list
-iterativeCounter = 0
+p1IterativeCounter = 0
+p2IterativeCounter = 0
 
+global p1
+global p2
 
-p1 = StupidBot('Stupid Bot')
+p1 = IterativeBot('Iterative Bot')
+p2 = IterativeBot('Iterative Bot')
 p1move = p1.play()
-p2 = Human('Human')
 p2move = p2.play()
 print (p1move.compareTo(p2move))
-
 opponentMove = p2move
 
+p1 = IterativeBot('Iterative Bot')
+p2 = IterativeBot('Iterative Bot')
+p1move = p1.play()
+p2move = p2.play()
+print (p1move.compareTo(p2move))
+opponentMove = p2move
 
+p1 = IterativeBot('Iterative Bot')
+p2 = IterativeBot('Iterative Bot')
+p1move = p1.play()
+p2move = p2.play()
+print (p1move.compareTo(p2move))
+opponentMove = p2move
 
+p1 = IterativeBot('Iterative Bot')
+p2 = IterativeBot('Iterative Bot')
+p1move = p1.play()
+p2move = p2.play()
+print (p1move.compareTo(p2move))
+opponentMove = p2move
+
+p1 = IterativeBot('Iterative Bot')
+p2 = IterativeBot('Iterative Bot')
+p1move = p1.play()
+p2move = p2.play()
+print (p1move.compareTo(p2move))
+opponentMove = p2move
 
 
 
