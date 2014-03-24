@@ -12,12 +12,144 @@
 #For use in generating random numbers
 import random
 
-#String variable indicating my name.
-#I did not work with a partner on this lab
-myName = "Monica Thornton"
-print ("CSCI 305 Lab 2 submitted by " + myName + ".")
+
+class MainClass:
+
+    def main(self):
+        global p1
+        global p2
+    
+        global rounds
+
+        global p1Move
+        global p2Move
+    
+        #String variable indicating my name.
+        #I did not work with a partner on this lab
+        myName = "Monica Thornton"
+
+        p1 = None
+        p2 = None
+
+        p1Move = None
+        p2Move = None
+
+        p1Wins = 0
+        p2Wins = 0
+        
+        rounds = 1
+
+        #move all this to a print menu func??????????????????????????????????????????????????????????????
+        print("Welcome to Rock, Paper, Scissors, Lizard, Spock, implemented by " + myName + "\n")
+        print("Please choose two players: ")        
+        print("   (1) Human")
+        print("   (2) Stupid Bot")
+        print("   (3) Random Bot")
+        print("   (4) Iterative Bot")
+        print("   (5) Last Play Bot")
+        print("   (6) My Bot\n")
+
+        #Sets up a list with all of the valid choices, so we can make sure the user picks one  
+        validChoices = [1, 2, 3, 4, 5, 6]
+
+        #Loop to make sure that the input for Player 1 is one of the valid choices
+        while True:
+            #Gets the first selection from the user
+            userChoice1 = input("Select Player 1: ")
+
+            #tests that the user inputs are digits, and also that they are one of the valid choices in the list above
+            if str.isdigit(userChoice1) == True and int(userChoice1) in validChoices:
+                userChoice1 = int(userChoice1)
+                #Checks if the user choice is valid
+                if userChoice1 in validChoices:
+                    if userChoice1 == 1:
+                        p1 = Human('Human')
+                        
+                    elif userChoice1 == 2:
+                        p1 = StupidBot('Stupid Bot')
+
+                    elif userChoice1 == 3:
+                        p1 = RandomBot('Random Bot')
+
+                    elif userChoice1 == 4:
+                        p1 = IterativeBot('Iterative Bot')
+
+                    elif userChoice1 == 5:
+                        p1 = LastPlayBot('Last Play Bot')
+
+                    elif userChoice1 == 6:
+                        p1 = MyBot('MyBot')
+                    break
+            else:
+                #If user choice is invalid, print a message to a user and continue to loop
+                print("Invalid bot choice. Please try again.")
+
+        #Loop to make sure that the input for Player 2 is one of the valid choices
+        while True:
+            #Gets the first selection from the user
+            userChoice2 = input("Select Player 2: ")
+
+            #tests that the user inputs are digits, and also that they are one of the valid choices in the list above
+            if str.isdigit(userChoice2) == True and int(userChoice2) in validChoices:
+                userChoice2 = int(userChoice2)
+                #Checks if the user choice is valid
+                if userChoice2 in validChoices:
+                    if userChoice2 == 1:
+                        p2 = Human('Human')
+                        
+                    elif userChoice2 == 2:
+                        p2 = StupidBot('Stupid Bot')
+
+                    elif userChoice2 == 3:
+                        p2 = RandomBot('Random Bot')
+
+                    elif userChoice2 == 4:
+                        p2 = IterativeBot('Iterative Bot')
+
+                    elif userChoice2 == 5:
+                        p2 = LastPlayBot('Last Play Bot')
+
+                    elif userChoice2 == 6:
+                        p2 = MyBot('MyBot')
+                    break
+            else:
+                #If user choice is invalid, print a message to a user and continue to loop
+                print("Invalid bot choice. Please try again.")
+
+        print("\n" + p1.name() + " vs " + p2.name() +". Go!\n")
+
+        for x in range (0, 5):
+            print ("Round " + str(rounds) +":")
+            p1Move = p1.play()
+            p2Move = p2.play()
+            print("Player 1 chose " + p1Move.name())
+            print("Player 2 chose " + p2Move.name())
+            outcome = p1Move.compareTo(p2Move)
+
+            print(outcome[0])
+                        
+            if outcome[1] == "Win":
+                p1Wins = p1Wins + 1
+                print("Player 1 won the round\n")
+            elif outcome[1] == "Lose":
+                p2Wins = p2Wins + 1
+                print("Player 2 won the round\n")
+            else:
+                print("Round was a tie\n")
+                
+            rounds = rounds + 1
+
+        print ("The score is " + str(p1Wins) + " to " + str(p2Wins) + ".")
+
+        if p1Wins == p2Wins:
+            print("Game was a draw.")
+        elif p1Wins > p2Wins:
+            print("Player 1 wins the game.")
+        else:
+            print("Player 2 wins the game.")    
 
 
+     
 """A superclass that the five subclasses Rock, Paper, Scissors, Lizard and Spock all inherit from"""
 class Element (object):
     #an instance variable to store the name of each Element
@@ -341,8 +473,11 @@ class LastPlayBot (Player):
         global p2
 
         #A global variable to store the opponent's last move, used to specify/differentiate between p1 and p2
-        global p1sOpponentsLastMove
-        global p2sOpponentsLastMove
+        global p1Move
+        global p2Move
+
+        p1sOpponentsLastMove = p2Move
+        p2sOpponentsLastMove = p1Move
 
         #Checks if self is p1 or p2 - to update the correct global variables
         if p1 == self:
@@ -405,6 +540,8 @@ class Human (Player):
         while True:
             #Gets the selection from the user
             userChoice = input("Enter your move: ")
+            #inserts an empty line, because if you have 2 Human players, output can look a bit cluttered
+            print("")
             #tests that the user input is a digit, and also that it is one of the valid choices in the list above
             if str.isdigit(userChoice) == True and int(userChoice) in validChoices:
                 userChoice = int(userChoice)
@@ -432,7 +569,6 @@ class MyBot (Player):
     def __init__(self,name):
         super(MyBot,self).__init__("MyBot")
 
-    
     """Overrides the play method inherited from Player, with the MyBot strategy implemented. Details of the strategy are found in the
     comments for the conditional statements below"""    
     def play(self):
@@ -448,22 +584,20 @@ class MyBot (Player):
         global p2Wins
 
         #global variable to keep track of the last moves for p1 and p2
-        global p1sOpponentsLastMove
-        global p2sOpponentsLastMove
+        global p1Move
+        global p2Move
 
-        #saves the last move made by p1 (in other words, p2s opponent) into a local variable
-        p1LastMove = p2sOpponentsLastMove
+        #saves the last move made by p1 into a local variable
+        p1LastMove = p1Move
         
-        #saves the last move made by p2 (in other words, p1s opponent) into a local variable        
-        p2LastMove = p1sOpponentsLastMove
+        #saves the last move made by p2 into a local variable        
+        p2LastMove = p2Move
         
         """Inexperienced players tend to lead with rock (for males) and paper (for females) - paper will beat rock and tie paper, so this is the most likely first
         move. Based on that information, we make paper the most likely first move. However, if the first for the MyBot player is always Paper, it will be very easy
         to beat, so knowing that the other player is anticipating a paper play - choose either Spock (who will smash scissors, but still vaporize rock) or Rock
         (which will crush Lizard, yet still tie if they play rock)."""
-        if rounds == 0:
-            #increments the round counter
-            rounds = rounds + 1
+        if rounds == 1:
 
             #generates a random integer, so we can choose from Paper, Spock and Lizard
             randomInteger = random.randint(1, 4)
@@ -480,10 +614,9 @@ class MyBot (Player):
         if self == p1:
             #if p1 (self, the MyBot player) is winning, we anticipate the other player will get desperate and go for the strategy described above 
             if p1Wins > p2Wins:
-                #increment the round counter
-                rounds = rounds + 1
-                randomInteger = random.randint(1, 4)
 
+                randomInteger = random.randint(1, 4)
+                                 
                 if p2LastMove.name() == "Rock":
                     #p2 is likely to play what would have beaten Rock (Spock or Paper)
                     #Based on that assumption, p1 chooses their move to beat Spock or Paper - and Lizard beats both, so that is the most likely move.
@@ -552,22 +685,22 @@ class MyBot (Player):
                     else:
                         #Throw Rock about 25% of the time
                         calculatedMove = moves[0]
-                    
+
 
         #if p2 (self, the MyBot player) is winning, we anticipate the other player will get desperate and go for the strategy described above   
         elif self == p2:
-            if p1Wins < p2Wins:
-                rounds = rounds + 1
-                if p1LastMove.name() == "Rock":
-                    #p1 is likely to play what would have beaten Rock (Spock or Paper)
-                    #Based on that assumption, p2 chooses their move to beat Spock or Paper - and Lizard beats both, so that is the most likely move.
+                randomInteger = random.randint(1, 4)
+                if p1Wins < p2Wins:  
+                    if p1LastMove.name() == "Rock":
+                        #p1 is likely to play what would have beaten Rock (Spock or Paper)
+                        #Based on that assumption, p2 chooses their move to beat Spock or Paper - and Lizard beats both, so that is the most likely move.
                     
-                    if randomInteger >= 2:
-                        #Make Lizard the move most often thrown in this situation
-                        calculatedMove = moves[3]
-                    elif randomInteger == 2:
-                        #Throw Scissors about 25% of the time
-                        calculatedMove = moves[2]
+                        if randomInteger >= 2:
+                            #Make Lizard the move most often thrown in this situation
+                            calculatedMove = moves[3]
+                        elif randomInteger == 2:
+                            #Throw Scissors about 25% of the time
+                            calculatedMove = moves[2]
                     else:
                         #Throw Paper about 25% of the time
                         calculatedMove = moves[1]
@@ -626,22 +759,15 @@ class MyBot (Player):
                     else:
                         #Throw Rock about 25% of the time
                         calculatedMove = moves[0]
-                    
-            #based on the decisions you have made above (given the opponents throw), throw the move that makes the most sense   
-            return calculatedMove
-         
-   
-        #Play randomly when the self player is not losing
-        rounds = rounds + 1
+
+                    #based on the decisions you have made above (given the opponents throw), throw the move that makes the most sense   
+                    return calculatedMove
+
+        #If self player is losing, falls back on a random strategy (as that is the most effective strategy)
+
+        #selects a move at random from the move list
         randomMove = random.randint(0, 4)
         return moves[randomMove]
-
-
-
-
-
-
-
 
 """This stuff will eventually go in main!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!"""                  
 #Calls the moves list function, so the moves are instantiated and stored in a list
@@ -655,67 +781,22 @@ global p2IterativeCounter
 p1IterativeCounter = 0
 p2IterativeCounter = 0
 
-global p1
-global p2
-
-global p1sOpponentsLastMove
-global p2sOpponentsLastMove
-
-global p1Move
-global p2Move
 
 
-global rounds
+
 
 p1Wins = 0
 p2Wins = 0
 rounds = 0
 
-p1 = None
-p2 = None
-p1sOpponentsLastMove = None
-p2sOpponentsLastMove = None
-
-for x in range (0, 5):
-    #p1 = StupidBot('Stupid Bot')
-    #p1 = RandomBot('Random Bot')
-    #p1 = IterativeBot('Iterative Bot')
-    #p1 = LastPlayBot('Last Play Bot')
-    p1 = Human('Human')
-    #p1 = MyBot('MyBot')
-
-    #p2 = StupidBot('Stupid Bot')    
-    #p2 = RandomBot('Random Bot')
-    #p2 = IterativeBot('Iterative Bot')
-    p2 = LastPlayBot('Last Play Bot')    
-    #p2 = Human('Human')
-    p1Move = p1.play()
-    p2Move = p2.play()
-    p1sOpponentsLastMove = p2Move
-    p2sOpponentsLastMove = p1Move
-    print ("p1 played " + p1Move.name())
-    print ("p2 played " + p2Move.name())
-    outcome = p1Move.compareTo(p2Move)
-    print (outcome[0])
-    print (outcome[1])
-    if outcome[1] == "Win":
-        p1Wins = p1Wins + 1
-    elif outcome[1] == "Lose":
-        p2Wins = p2Wins + 1
-    print("______________________________")
 
 
 
-print ("# rounds: " + str(rounds))
-print ("p1 wins = " + str(p1Wins))
-print ("p2 wins = " + str(p2Wins))
+mc = MainClass
+mc.main('Main Class')
 
-if p1Wins == p2Wins:
-    print("Game was a draw")
-elif p1Wins > p2Wins:
-    print("Player 1 emerged victorious")
-else:
-    print("Player 2 emerged victorious")    
+
+
 
 
 
