@@ -17,19 +17,22 @@ import random
 class MainClass:
 
     def main(self):
+        #Global variables to keep track of Player 1 and Player 2
         global p1
         global p2
-    
+
+        #A global variable to keep track of the current round number
         global rounds
 
-        #Keeps track of p1OldMove (because it gets overwritten right away), and p2Move as global variables for use in the LastPlayBot and MyBot
+        #Keeps track of p1OldMove (because p1Move gets overwritten right away), and p2Move as global variables for use in the LastPlayBot and MyBot.
         global p1OldMove
         global p2Move
 
-        #A global variable to keep track of the location in the moves list, for use with the Iterative Bot
+        #Global variables to keep track of the location in the moves list, for use with the Iterative Bot(s) to play the correct move chronologically
         global p1IterativeCounter
         global p2IterativeCounter
 
+        #Global variables to keep track of the number of wins for each player
         global p1Wins
         global p2Wins
 
@@ -37,25 +40,29 @@ class MainClass:
         p1IterativeCounter = 0
         p2IterativeCounter = 0
 
+        #Sets p1 and p2 equal to None, as they have not been instantiated as any of the different types of Players yet
         p1 = None
         p2 = None
 
+        #Sets p1Move and p2Move equal to None, as p1 and p2 have not played any moves yet
         p1Move = None
         p2Move = None
 
+        #Sets the number of wins equal to 0 for each player, as no rounds have been played yet
         p1Wins = 0
         p2Wins = 0
 
-        #Calls the moves list function, so the moves are instantiated and stored in a list
+        #Calls the moves list function, which makes concrete instances of each of the moves and stores them in a list
         moves_list()
 
         #String variable indicating my name.
         #I did not work with a partner on this lab
         myName = "Monica Thornton"
-        
+
+        #Sets the number of rounds equal to 1, so that we can count to the specified number of rounds in the game
         rounds = 1
 
-        #move all this to a print menu func??????????????????????????????????????????????????????????????
+        #Prints a menu with all of the choices for the user to select from
         print("Welcome to Rock, Paper, Scissors, Lizard, Spock, implemented by " + myName + "\n")
         print("Please choose two players: ")        
         print("   (1) Human")
@@ -78,6 +85,7 @@ class MainClass:
                 userChoice1 = int(userChoice1)
                 #Checks if the user choice is valid
                 if userChoice1 in validChoices:
+                    #If so, sets p1 as the appropriate bot type
                     if userChoice1 == 1:
                         p1 = Human('Human')
                         
@@ -95,6 +103,7 @@ class MainClass:
 
                     elif userChoice1 == 6:
                         p1 = MyBot('MyBot')
+                    #Leaves the while loop once a valid choice has been selected
                     break
             else:
                 #If user choice is invalid, print a message to a user and continue to loop
@@ -110,6 +119,7 @@ class MainClass:
                 userChoice2 = int(userChoice2)
                 #Checks if the user choice is valid
                 if userChoice2 in validChoices:
+                    #If so, sets p2 as the appropriate bot type
                     if userChoice2 == 1:
                         p2 = Human('Human')
                         
@@ -127,39 +137,56 @@ class MainClass:
 
                     elif userChoice2 == 6:
                         p2 = MyBot('MyBot')
+                    #Leaves the while loop once a valid choice has been selected
                     break
             else:
                 #If user choice is invalid, print a message to a user and continue to loop
                 print("Invalid bot choice. Please try again.")
 
+        #Prints a message to the user, reiterating the two bots that they have selected
         print("\n" + p1.name() + " vs " + p2.name() +". Go!\n")
 
-
+        #Allows us to stop the game after a specified number of rounds (in this case, 5)
         for x in range (0, 5):
+            #Prints a message telling the user what round we are in
             print ("Round " + str(rounds) +":")
+
+            #Stores the value of p1 before p1 is reset
             p1OldMove = p1Move
+
+            #stores the move returned when p1 and p2 invoke the play method for their particular Player
             p1Move = p1.play()
             p2Move = p2.play()
-            
-            print("Player 1 chose " + p1Move.name())
-            print("Player 2 chose " + p2Move.name())
+
+            #Prints info on each players move, for the user
+            print("  Player 1 chose " + p1Move.name())
+            print("  Player 2 chose " + p2Move.name())
+
+            #Saves the tuple returned by the compareTo method for the particular method in the outcome variable
             outcome = p1Move.compareTo(p2Move)
 
-            print(outcome[0])
-                        
+            #Prints the first value returned as part of the tuple, the action that takes place when the two moves are pitted against each other
+            print("  " + outcome[0])
+
+            #Checks the value returned as part of the tuple, uses it to increment the appropriate win count (or not, in the case of a tie)           
             if outcome[1] == "Win":
+                #If p1 wins, increments the win count for p1 and prints the appropriate message
                 p1Wins = p1Wins + 1
-                print("Player 1 won the round\n")
+                print("  Player 1 won the round\n")
             elif outcome[1] == "Lose":
+                #if p2 wins, increments the win count for p2 and prints the appropriate message
                 p2Wins = p2Wins + 1
-                print("Player 2 won the round\n")
+                print("  Player 2 won the round\n")
             else:
-                print("Round was a tie\n")
-                
+                print("  Round was a tie\n")
+
+            #increments the round counter    
             rounds = rounds + 1
 
+        #After finishing the while loop, prints the final score
         print ("The score is " + str(p1Wins) + " to " + str(p2Wins) + ".")
 
+        #Prints information on the winner of the game
         if p1Wins == p2Wins:
             print("Game was a draw.")
         elif p1Wins > p2Wins:
@@ -167,8 +194,6 @@ class MainClass:
         else:
             print("Player 2 wins the game.")    
 
-
-     
 """A superclass that the five subclasses Rock, Paper, Scissors, Lizard and Spock all inherit from"""
 class Element (object):
     #an instance variable to store the name of each Element
@@ -184,8 +209,8 @@ class Element (object):
     def name(self):
          return self._name
 
-    """An abstract method to compare Elements, to determine the win status/method of winning when pitted against eachother.
-    Each subclass will override this method in different ways, and we will not be comparing Element objects to eachother directly,
+    """An abstract method to compare Elements, to determine the win status/method of winning when pitted against each other.
+    Each subclass will override this method in different ways, and we will not be comparing Element objects to each other directly,
     so we throw an exception if someone tries to compare two Element objects directly."""
     def compareTo(self, element):
          raise NotImplementedError("Not yet implemented")
@@ -193,7 +218,7 @@ class Element (object):
 """A subclass to represent the Rock element, which triumphs when pitted against Lizard or Rock,
 but perishes against Paper or Spock. If Rock is played against itself in a match, it results in a tied game."""
 class Rock (Element):
-    #The name instance variable from Element is overriden, and its value set to Rock
+    #The name instance variable from Element is overridden, and its value set to Rock
     _name = "Rock"
 
     #Constructor to build Rocks
@@ -225,7 +250,7 @@ class Rock (Element):
 """A subclass to represent the Paper element, which triumphs when pitted against Rock or Spock,
 but perishes against Scissors or Lizard. If Paper is played against itself in a match, it results in a tied game."""
 class Paper (Element):
-    #the name instance variable from Element is overriden, and its value set to Paper
+    #the name instance variable from Element is overridden, and its value set to Paper
     _name = "Paper"
 
     #Constructor to build Papers
@@ -257,7 +282,7 @@ class Paper (Element):
 """A subclass to represent the Scissors element, which triumphs when pitted against Paper or Lizard,
 but perishes against Spock or Rock. If Scissors is played against itself in a match, it results in a tied game."""
 class Scissors (Element):
-    #the name instance variable from Element is overriden, and its value set to Scissors
+    #the name instance variable from Element is overridden, and its value set to Scissors
     _name = "Scissors"
 
     #Constructor to build Scissors
@@ -289,7 +314,7 @@ class Scissors (Element):
 """A subclass to represent the Lizard element, which triumphs when pitted against Spock or Paper,
 but perishes against Rock or Scissors. If Lizard is played against itself in a match, it results in a tied game."""
 class Lizard (Element):
-    #the name instance variable from Element is overriden, and its value set to Lizard
+    #the name instance variable from Element is overridden, and its value set to Lizard
     _name = "Lizard"
 
     #Constructor to build Lizard
@@ -321,7 +346,7 @@ class Lizard (Element):
 """A subclass to represent the Spock element, which triumphs when pitted against Scissors or Rock,
 but perishes against Paper or Lizard. If Spock is played against itself in a match, it results in a tied game."""
 class Spock (Element):
-    #the name instance variable from Element is overriden, and its value set to Rock
+    #the name instance variable from Element is overridden, and its value set to Rock
     _name = "Spock"
 
     #Constructor to build Spocks
@@ -390,7 +415,7 @@ class Player (object):
 """A subclass to represent the StupidBot player, which plays the same move every time. In the spirit of the Big Bang Theory,
    StupidBot plays Spock every time."""
 class StupidBot (Player):
-    #The name instance variable from Player is overriden, and its value set to StupidBot
+    #The name instance variable from Player is overridden, and its value set to StupidBot
     _name = "Stupid Bot"
 
     #Constructor to build StupidBot players
@@ -404,7 +429,7 @@ class StupidBot (Player):
 
 """A subclass to represent the RandomBot player, which plays a random move every time."""
 class RandomBot (Player):
-    #The name instance variable from Player is overriden, and its value set to RandomBot
+    #The name instance variable from Player is overridden, and its value set to RandomBot
     _name = "Random Bot"
 
     #Constructor to build RandomBot players
@@ -424,7 +449,7 @@ class RandomBot (Player):
 """A subclass to represent the IterativeBot player, which iterates through the move list to choose its move. Once it has gone through
 the entire move list, it starts again."""
 class IterativeBot (Player):
-    #The name instance variable from Player is overriden, and its value set to IterativeBot
+    #The name instance variable from Player is overridden, and its value set to IterativeBot
     _name = "Iterative Bot"
 
     #Constructor to build IterativeBot players
@@ -477,7 +502,7 @@ class IterativeBot (Player):
                
 """A subclass to represent the LastPlayBot player, which chooses its move based on the last move the opponent played."""
 class LastPlayBot (Player):
-    #The name instance variable from Player is overriden, and its value set to LastPlayBot
+    #The name instance variable from Player is overridden, and its value set to LastPlayBot
     _name = "Last Play Bot"
 
     #Constructor to build LastPlayBot players
@@ -536,7 +561,7 @@ class LastPlayBot (Player):
 
 """A subclass to represent the Human player, in which the series of moves are determined by the Human player."""
 class Human (Player):
-    #The name instance variable from Player is overriden, and its value set to Human
+    #The name instance variable from Player is overridden, and its value set to Human
     _name = "Human"
 
     #Constructor to build Human players
@@ -582,7 +607,7 @@ class Human (Player):
 rarely truly random. This bot exploits some of the well known fallacies of the human player, and depending on the number
 of rounds played so far, the opponent's last move, and the win/loss ratio, employs different strategies."""
 class MyBot (Player):
-    #The name instance variable from Player is overriden, and its value set to MyBot
+    #The name instance variable from Player is overridden, and its value set to MyBot
     _name = "MyBot"
 
     #Constructor to build MyBot players
@@ -629,7 +654,7 @@ class MyBot (Player):
             else:
                 return moves[1]
 
-        """When they are losing, people are more likely to (subconciously)play the move that would have beaten their last move. Therefore, if the other player
+        """When they are losing, people are more likely to (subconsciously) play the move that would have beaten their last move. Therefore, if the other player
         is losing, make a move to counter that strategy (again, don't rely on throwing one move exclusively - but make it the most likely move)."""
         if self == p1:
             #if p1 (self, the MyBot player) is winning, we anticipate the other player will get desperate and go for the strategy described above 
@@ -794,10 +819,23 @@ class MyBot (Player):
 mc = MainClass
 mc.main('Main Class')
 
+#Sets up a list with the valid choices, so we can make sure the user picks one  
+validChoices = ['y', 'n']
 
+while True:
+    #Gets the selection from the user determining if they will play another game or not
+    userChoice = input("\nType y if you would like to play again, n if you would like to quit: ")
 
-
-
-
-
-
+    #tests that they are one of the valid choices in the list above
+    if userChoice in validChoices:
+        #If so, sets p1 as the appropriate bot type
+        if userChoice == 'y':
+            mc = MainClass
+            mc.main('Main Class')
+                        
+        elif userChoice == 'n':
+            print("Thanks for playing!")
+            break
+    else:
+        #If user choice is invalid, print a message to a user and continue to loop
+        print("Invalid choice. Please enter y or n.")
