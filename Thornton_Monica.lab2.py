@@ -12,7 +12,6 @@
 #For use in generating random numbers
 import random
 
-
 class MainClass:
 
     def main(self):
@@ -21,12 +20,17 @@ class MainClass:
     
         global rounds
 
-        global p1Move
+        #Keeps track of p1OldMove (because it gets overwritten right away), and p2Move as global variables for use in the LastPlayBot and MyBot
+        global p1OldMove
         global p2Move
-    
-        #String variable indicating my name.
-        #I did not work with a partner on this lab
-        myName = "Monica Thornton"
+
+        #A global variable to keep track of the location in the moves list, for use with the Iterative Bot
+        global p1IterativeCounter
+        global p2IterativeCounter
+
+        #Sets iterativeCounter to 0, which is the start of the moves list
+        p1IterativeCounter = 0
+        p2IterativeCounter = 0
 
         p1 = None
         p2 = None
@@ -36,6 +40,10 @@ class MainClass:
 
         p1Wins = 0
         p2Wins = 0
+
+        #String variable indicating my name.
+        #I did not work with a partner on this lab
+        myName = "Monica Thornton"
         
         rounds = 1
 
@@ -120,8 +128,10 @@ class MainClass:
 
         for x in range (0, 5):
             print ("Round " + str(rounds) +":")
+            p1OldMove = p1Move
             p1Move = p1.play()
             p2Move = p2.play()
+            
             print("Player 1 chose " + p1Move.name())
             print("Player 2 chose " + p2Move.name())
             outcome = p1Move.compareTo(p2Move)
@@ -473,19 +483,19 @@ class LastPlayBot (Player):
         global p2
 
         #A global variable to store the opponent's last move, used to specify/differentiate between p1 and p2
-        global p1Move
+        global p1oldMove
         global p2Move
 
-        p1sOpponentsLastMove = p2Move
-        p2sOpponentsLastMove = p1Move
-
+        #Checks if we are in the first round
+        global rounds
+       
         #Checks if self is p1 or p2 - to update the correct global variables
         if p1 == self:
             #opponentMove is a local variable to keep track of what your opponent played
-            opponentMove = p1sOpponentsLastMove
-
+            opponentMove = p2Move
+            
             #If first move of round (ergo, opponent has not moved yet), play random move
-            if opponentMove is None:
+            if opponentMove is None or rounds == 1:
 
                 #Generate a random number between 0 and 4, save it in the variable randomMove
                 randomMove = random.randint(0, 4)
@@ -494,16 +504,18 @@ class LastPlayBot (Player):
                 return moves[randomMove]
         
             else:
+                
                 #If your opponent has already moved, play their move from last turn for this turn
                 return opponentMove
 
         elif p2 == self:
             #opponentMove is a local variable to keep track of what your opponent played
-            opponentMove = p2sOpponentsLastMove
+            opponentMove = p1OldMove
 
             #If first move of round (ergo, opponent has not moved yet), play random move
-            if opponentMove is None:
-
+            if opponentMove is None or rounds == 1:
+                
+                print("You are in the first part of p2 (the random part)")
                 #Generate a random number between 0 and 4, save it in the variable randomMove
                 randomMove = random.randint(0, 4)
             
@@ -512,6 +524,8 @@ class LastPlayBot (Player):
         
             else:
                 #If your opponent has already moved, play their move from last turn for this turn
+                print("You are in the second part of p2 (the play last move part)")
+                print("Opponent's last move was " + opponentMove.name())
                 return opponentMove
 
 """A subclass to represent the Human player, in which the series of moves are determined by the Human player."""
@@ -584,11 +598,11 @@ class MyBot (Player):
         global p2Wins
 
         #global variable to keep track of the last moves for p1 and p2
-        global p1Move
+        global p1OldMove
         global p2Move
 
         #saves the last move made by p1 into a local variable
-        p1LastMove = p1Move
+        p1LastMove = p1OldMove
         
         #saves the last move made by p2 into a local variable        
         p2LastMove = p2Move
@@ -773,13 +787,7 @@ class MyBot (Player):
 #Calls the moves list function, so the moves are instantiated and stored in a list
 moves_list()
 
-#A global variable to keep track of the location in the moves list, for use with the Iterative Bot
-global p1IterativeCounter
-global p2IterativeCounter
 
-#Sets iterativeCounter to 0, which is the start of the moves list
-p1IterativeCounter = 0
-p2IterativeCounter = 0
 
 
 
