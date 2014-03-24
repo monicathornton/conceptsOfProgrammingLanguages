@@ -281,7 +281,8 @@ class IterativeBot (Player):
         super(IterativeBot,self).__init__("Iterative Bot")
         
     """Overrides the play method inherited from Player, with the Iterative move strategy implemented. In this strategy, a move is picked from
-    the moves list and played, and the move immediately preceding it is picked for our next move."""    
+    the moves list and played, and the move immediately following it is picked for our next move. We start over once we have gone through the entire
+    moves list."""    
     def play(self):
         #Specifies that the below variables are global, used to keep track of where we are iteratively for p1 and p2
         global p1IterativeCounter
@@ -383,7 +384,7 @@ class Human (Player):
     #The name instance variable from Player is overriden, and its value set to Human
     _name = "Human"
 
-    #Constructor to build IterativeBot players
+    #Constructor to build Human players
     def __init__(self,name):
         super(Human,self).__init__("Human")
 
@@ -402,14 +403,17 @@ class Human (Player):
 
         #Loop to make sure that the input is one of the valid choices
         while True:
-            #Casts the user choice as an integer value
-            userChoice = int(input("Enter your move: "))
-            #Checks if the user choice is valid
-            if userChoice in validChoices:
-                #If userChoice is a valid entry, subtract one from the value (because moves is 0 indexed)
-                userChoice = userChoice - 1
-                #We have adjusted our valid user choice, so break out of the loop
-                break
+            #Gets the selection from the user
+            userChoice = input("Enter your move: ")
+            #tests that the user input is a digit, and also that it is one of the valid choices in the list above
+            if str.isdigit(userChoice) == True and int(userChoice) in validChoices:
+                userChoice = int(userChoice)
+                #Checks if the user choice is valid
+                if userChoice in validChoices:
+                    #If userChoice is a valid entry, subtract one from the value (because moves is 0 indexed)
+                    userChoice = userChoice - 1
+                    #We have adjusted our valid user choice, so break out of the loop
+                    break
             else:
                 #If user choice is invalid, print a message to a user and continue to loop
                 print("Invalid move. Please try again.")                
@@ -417,17 +421,20 @@ class Human (Player):
         #Return the Human choice to the calling function    
         return moves[userChoice]  
 
-"""DONE TO HERE!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!"""
+"""MyBot uses the fact that while a random player is going to have the highest percentage of wins, a Human player is
+rarely truly random. This bot exploits some of the well known fallacies of the human player, and depending on the number
+of rounds played so far, the opponent's last move, and the win/loss ratio, employs different strategies."""
 class MyBot (Player):
-    #The name instance variable from Player is overriden, and its value set to Human
+    #The name instance variable from Player is overriden, and its value set to MyBot
     _name = "MyBot"
 
-    #Constructor to build IterativeBot players
+    #Constructor to build MyBot players
     def __init__(self,name):
         super(MyBot,self).__init__("MyBot")
 
     
-    """Overrides the play method inherited from Player, with the Human player picking the moves."""    
+    """Overrides the play method inherited from Player, with the MyBot strategy implemented. Details of the strategy are found in the
+    comments for the conditional statements below"""    
     def play(self):
         #Specifies that the below variables are global, used to specify/differentiate between p1 and p2        
         global p1
@@ -472,7 +479,7 @@ class MyBot (Player):
         is losing, make a move to counter that strategy (again, don't rely on throwing one move exclusively - but make it the most likely move)."""
         if self == p1:
             #if p1 (self, the MyBot player) is winning, we anticipate the other player will get desperate and go for the strategy described above 
-            if p1Wins < p2Wins:
+            if p1Wins > p2Wins:
                 #increment the round counter
                 rounds = rounds + 1
                 randomInteger = random.randint(1, 4)
@@ -546,68 +553,94 @@ class MyBot (Player):
                         #Throw Rock about 25% of the time
                         calculatedMove = moves[0]
                     
-                #based on the decisions you have made above (given the opponents throw), throw the move that makes the most sense   
-                return moves[calculatedMove]
 
-       #this all needs to be fixed     
+        #if p2 (self, the MyBot player) is winning, we anticipate the other player will get desperate and go for the strategy described above   
         elif self == p2:
-            if p1Wins > p2Wins:
+            if p1Wins < p2Wins:
                 rounds = rounds + 1
-                if p2LastMove.name() == "Rock":
-                    #Play what would have beaten Rock (Spock or Paper)
-                    #Generate a random number between 1 and 4, save it in the variable randomInteger
-                    randomInteger = random.randint(1, 4)
-
-                    if randomInteger <= 2:
-                        return moves[4]
-                    else:
-                        return moves[1]
-            
-                elif p2LastMove.name() == "Paper":
-                    print ("you are in the p1LastMove == paper part")
-                    #Play would would have beaten Paper (Scissors or Lizard)
-                    #Generate a random number between 1 and 4, save it in the variable randomInteger
-                    randomInteger = random.randint(1, 4)
-
-                    if randomInteger <= 2:
-                        return moves[3]
-                    else:
-                        return moves[2]
-           
-                elif p2LastMove.name() == "Scissors":
-                    #Play what would have beaten Scissors (Rock or Spock)
-                    #Generate a random number between 1 and 4, save it in the variable randomInteger
-                    randomInteger = random.randint(1, 4)
-
-                    if randomInteger <= 2:
-                        return moves[0]
-                    else:
-                        return moves[4]
+                if p1LastMove.name() == "Rock":
+                    #p1 is likely to play what would have beaten Rock (Spock or Paper)
+                    #Based on that assumption, p2 chooses their move to beat Spock or Paper - and Lizard beats both, so that is the most likely move.
                     
-                elif p2LastMove.name() == "Lizard":
-                    #Play what would have beaten Lizard (Rock or Scissors)
-                    #Generate a random number between 1 and 4, save it in the variable randomInteger
-                    randomInteger = random.randint(1, 4)
-
-                    if randomInteger <= 2:
-                        return moves[2]
+                    if randomInteger >= 2:
+                        #Make Lizard the move most often thrown in this situation
+                        calculatedMove = moves[3]
+                    elif randomInteger == 2:
+                        #Throw Scissors about 25% of the time
+                        calculatedMove = moves[2]
                     else:
-                        return moves[0]   
+                        #Throw Paper about 25% of the time
+                        calculatedMove = moves[1]
+
+                elif p1LastMove.name() == "Paper":
+                    #p1 is likely to play what would have beaten Paper (Scissors or Lizard)
+                    #Based on that assumption, p2 chooses their move to beat Scissors or Lizard - and Rock beats both, so that is the most likely move.
+                    if randomInteger >= 2:
+                        #Make Rock the move most often thrown in this situation
+                        calculatedMove = moves[0]
+                    elif randomInteger == 2:
+                        #Throw Scissors about 25% of the time
+                        calculatedMove = moves[2]
+                    else:
+                        #Throw Spock about 25% of the time
+                        calculatedMove = moves[4]
+
+                elif p1LastMove.name() == "Scissors":
+                    #p1 is likely to play what would have beaten Scissors (Spock or Rock)
+                    #Based on that assumption, p2 chooses their move to beat Spock or Rock - and Paper beats both, so that is the most likely move.
+                    
+                    if randomInteger >= 2:
+                        #Make Paper the move most often thrown in this situation
+                        calculatedMove = moves[1]
+                    elif randomInteger == 2:
+                        #Throw Lizard about 25% of the time
+                        calculatedMove = moves[3]
+                    else:
+                        #Throw Spock about 25% of the time
+                        calculatedMove = moves[4]
+                        
+                elif p2LastMove.name() == "Lizard":
+                    #p1 is likely to play what would have beaten Lizard (Rock or Scissors)
+                    #Based on that assumption, p2 chooses their move to beat Rock or Scissors - and  Spock beats both, so that is the most likely move.
+                    
+                    if randomInteger >= 2:
+                        #Make Spock the move most often thrown in this situation
+                        calculatedMove = moves[4]
+                    elif randomInteger == 2:
+                        #Throw Paper about 25% of the time
+                        calculatedMove = moves[1]
+                    else:
+                        #Throw Rock about 25% of the time
+                        calculatedMove = moves[0]
             
                 elif p2LastMove.name() == "Spock":
-                    #Play what would have beaten Spock (Paper or Lizard)
-                    #Generate a random number between 1 and 4, save it in the variable randomInteger
-                    randomInteger = random.randint(1, 4)
+                    #p1 is likely to play what would have beaten Spock (Paper or Lizard)
+                    #Based on that assumption, p2 chooses their move to beat Paper or Lizard - and Scissors beats both, so that is the most likely move.
 
-                    if randomInteger <= 2:
-                        return moves[0]
+                    if randomInteger >= 2:
+                        #Make Scissors the move most often thrown in this situation
+                        calculatedMove = moves[2]
+                    elif randomInteger == 2:
+                        #Throw Lizard about 25% of the time
+                        calculatedMove = moves[3]
                     else:
-                        return moves[1]             
+                        #Throw Rock about 25% of the time
+                        calculatedMove = moves[0]
+                    
+            #based on the decisions you have made above (given the opponents throw), throw the move that makes the most sense   
+            return calculatedMove
+         
    
-        #Play randomly when not down
+        #Play randomly when the self player is not losing
         rounds = rounds + 1
         randomMove = random.randint(0, 4)
         return moves[randomMove]
+
+
+
+
+
+
 
 
 """This stuff will eventually go in main!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!"""                  
@@ -644,8 +677,18 @@ p1sOpponentsLastMove = None
 p2sOpponentsLastMove = None
 
 for x in range (0, 5):
-    p1 = MyBot('MyBot')
-    p2 = Human('Human')
+    #p1 = StupidBot('Stupid Bot')
+    #p1 = RandomBot('Random Bot')
+    #p1 = IterativeBot('Iterative Bot')
+    #p1 = LastPlayBot('Last Play Bot')
+    p1 = Human('Human')
+    #p1 = MyBot('MyBot')
+
+    #p2 = StupidBot('Stupid Bot')    
+    #p2 = RandomBot('Random Bot')
+    #p2 = IterativeBot('Iterative Bot')
+    p2 = LastPlayBot('Last Play Bot')    
+    #p2 = Human('Human')
     p1Move = p1.play()
     p2Move = p2.play()
     p1sOpponentsLastMove = p2Move
