@@ -12,6 +12,8 @@
 #For use in generating random numbers
 import random
 
+"""Class (both super and sub) and function definitions below"""
+
 class MainClass:
 
     def main(self):
@@ -28,6 +30,9 @@ class MainClass:
         global p1IterativeCounter
         global p2IterativeCounter
 
+        global p1Wins
+        global p2Wins
+
         #Sets iterativeCounter to 0, which is the start of the moves list
         p1IterativeCounter = 0
         p2IterativeCounter = 0
@@ -40,6 +45,9 @@ class MainClass:
 
         p1Wins = 0
         p2Wins = 0
+
+        #Calls the moves list function, so the moves are instantiated and stored in a list
+        moves_list()
 
         #String variable indicating my name.
         #I did not work with a partner on this lab
@@ -125,6 +133,7 @@ class MainClass:
                 print("Invalid bot choice. Please try again.")
 
         print("\n" + p1.name() + " vs " + p2.name() +". Go!\n")
+
 
         for x in range (0, 5):
             print ("Round " + str(rounds) +":")
@@ -515,7 +524,6 @@ class LastPlayBot (Player):
             #If first move of round (ergo, opponent has not moved yet), play random move
             if opponentMove is None or rounds == 1:
                 
-                print("You are in the first part of p2 (the random part)")
                 #Generate a random number between 0 and 4, save it in the variable randomMove
                 randomMove = random.randint(0, 4)
             
@@ -524,8 +532,6 @@ class LastPlayBot (Player):
         
             else:
                 #If your opponent has already moved, play their move from last turn for this turn
-                print("You are in the second part of p2 (the play last move part)")
-                print("Opponent's last move was " + opponentMove.name())
                 return opponentMove
 
 """A subclass to represent the Human player, in which the series of moves are determined by the Human player."""
@@ -782,28 +788,11 @@ class MyBot (Player):
         #selects a move at random from the move list
         randomMove = random.randint(0, 4)
         return moves[randomMove]
+              
 
-"""This stuff will eventually go in main!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!"""                  
-#Calls the moves list function, so the moves are instantiated and stored in a list
-moves_list()
-
-
-
-
-
-
-
-p1Wins = 0
-p2Wins = 0
-rounds = 0
-
-
-
-
+"""Call the main class, in order to play a game of Paper, Rock, Scissors, Lizard, Spock with the specified characters"""
 mc = MainClass
 mc.main('Main Class')
-
-
 
 
 
