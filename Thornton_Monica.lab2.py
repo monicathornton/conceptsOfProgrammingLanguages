@@ -9,12 +9,14 @@
 # the chance of a tie.
 #########################################
 
+#For use in generating random numbers
 import random
 
 #String variable indicating my name.
 #I did not work with a partner on this lab
 myName = "Monica Thornton"
 print ("CSCI 305 Lab 2 submitted by " + myName + ".")
+
 
 """A superclass that the five subclasses Rock, Paper, Scissors, Lizard and Spock all inherit from"""
 class Element (object):
@@ -338,13 +340,13 @@ class LastPlayBot (Player):
         global p2
 
         #A global variable to store the opponent's last move, used to specify/differentiate between p1 and p2
-        global p1sOpponentsMove
-        global p2sOpponentsMove
+        global p1sOpponentsLastMove
+        global p2sOpponentsLastMove
 
         #Checks if self is p1 or p2 - to update the correct global variables
         if p1 == self:
             #opponentMove is a local variable to keep track of what your opponent played
-            opponentMove = p1sOpponentsMove
+            opponentMove = p1sOpponentsLastMove
 
             #If first move of round (ergo, opponent has not moved yet), play random move
             if opponentMove is None:
@@ -361,7 +363,7 @@ class LastPlayBot (Player):
 
         elif p2 == self:
             #opponentMove is a local variable to keep track of what your opponent played
-            opponentMove = p2sOpponentsMove
+            opponentMove = p2sOpponentsLastMove
 
             #If first move of round (ergo, opponent has not moved yet), play random move
             if opponentMove is None:
@@ -426,15 +428,186 @@ class MyBot (Player):
 
     
     """Overrides the play method inherited from Player, with the Human player picking the moves."""    
-    def play(self):            
-        return moves[0]  
+    def play(self):
+        #Specifies that the below variables are global, used to specify/differentiate between p1 and p2        
+        global p1
+        global p2
 
+        #global variable to keep track of the number of rounds        
+        global rounds
 
+        #global variable to keep track of the number of wins
+        global p1Wins
+        global p2Wins
 
+        #global variable to keep track of the last moves for p1 and p2
+        global p1sOpponentsLastMove
+        global p2sOpponentsLastMove
 
+        #saves the last move made by p1 (in other words, p2s opponent) into a local variable
+        p1LastMove = p2sOpponentsLastMove
+        
+        #saves the last move made by p2 (in other words, p1s opponent) into a local variable        
+        p2LastMove = p1sOpponentsLastMove
+        
+        """Inexperienced players tend to lead with rock (for males) and paper (for females) - paper will beat rock and tie paper, so this is the most likely first
+        move. Based on that information, we make paper the most likely first move. However, if the first for the MyBot player is always Paper, it will be very easy
+        to beat, so knowing that the other player is anticipating a paper play - choose either Spock (who will smash scissors, but still vaporize rock) or Rock
+        (which will crush Lizard, yet still tie if they play rock)."""
+        if rounds == 0:
+            #increments the round counter
+            rounds = rounds + 1
 
+            #generates a random integer, so we can choose from Paper, Spock and Lizard
+            randomInteger = random.randint(1, 4)
 
+            if randomInteger < 2:
+                return moves[4]
+            elif randomInteger == 2:
+                return moves[0]
+            else:
+                return moves[1]
 
+        """When they are losing, people are more likely to (subconciously)play the move that would have beaten their last move. Therefore, if the other player
+        is losing, make a move to counter that strategy (again, don't rely on throwing one move exclusively - but make it the most likely move)."""
+        if self == p1:
+            #if p1 (self, the MyBot player) is winning, we anticipate the other player will get desperate and go for the strategy described above 
+            if p1Wins < p2Wins:
+                #increment the round counter
+                rounds = rounds + 1
+                randomInteger = random.randint(1, 4)
+
+                if p2LastMove.name() == "Rock":
+                    #p2 is likely to play what would have beaten Rock (Spock or Paper)
+                    #Based on that assumption, p1 chooses their move to beat Spock or Paper - and Lizard beats both, so that is the most likely move.
+                    
+                    if randomInteger >= 2:
+                        #Make Lizard the move most often thrown in this situation
+                        calculatedMove = moves[3]
+                    elif randomInteger == 2:
+                        #Throw Scissors about 25% of the time
+                        calculatedMove = moves[2]
+                    else:
+                        #Throw Paper about 25% of the time
+                        calculatedMove = moves[1]
+                        
+                elif p2LastMove.name() == "Paper":
+                    #p2 is likely to play what would have beaten Paper (Scissors or Lizard)
+                    #Based on that assumption, p1 chooses their move to beat Scissors or Lizard - and Rock beats both, so that is the most likely move.
+                    if randomInteger >= 2:
+                        #Make Rock the move most often thrown in this situation
+                        calculatedMove = moves[0]
+                    elif randomInteger == 2:
+                        #Throw Scissors about 25% of the time
+                        calculatedMove = moves[2]
+                    else:
+                        #Throw Spock about 25% of the time
+                        calculatedMove = moves[4]
+           
+                elif p2LastMove.name() == "Scissors":
+                    #p2 is likely to play what would have beaten Scissors (Spock or Rock)
+                    #Based on that assumption, p1 chooses their move to beat Spock or Rock - and Paper beats both, so that is the most likely move.
+
+                    if randomInteger >= 2:
+                        #Make Paper the move most often thrown in this situation
+                        calculatedMove = moves[1]
+                    elif randomInteger == 2:
+                        #Throw Lizard about 25% of the time
+                        calculatedMove = moves[3]
+                    else:
+                        #Throw Spock about 25% of the time
+                        calculatedMove = moves[4]
+
+                elif p2LastMove.name() == "Lizard":
+                    #p2 is likely to play what would have beaten Lizard (Rock or Scissors)
+                    #Based on that assumption, p1 chooses their move to beat Rock or Scissors - and  Spock beats both, so that is the most likely move.
+
+                    if randomInteger >= 2:
+                        #Make Spock the move most often thrown in this situation
+                        calculatedMove = moves[4]
+                    elif randomInteger == 2:
+                        #Throw Paper about 25% of the time
+                        calculatedMove = moves[1]
+                    else:
+                        #Throw Rock about 25% of the time
+                        calculatedMove = moves[0]
+            
+                elif p2LastMove.name() == "Spock":
+                    #p2 is likely to play what would have beaten Spock (Paper or Lizard)
+                    #Based on that assumption, p1 chooses their move to beat Paper or Lizard - and Scissors beats both, so that is the most likely move.
+
+                    if randomInteger >= 2:
+                        #Make Scissors the move most often thrown in this situation
+                        calculatedMove = moves[2]
+                    elif randomInteger == 2:
+                        #Throw Lizard about 25% of the time
+                        calculatedMove = moves[3]
+                    else:
+                        #Throw Rock about 25% of the time
+                        calculatedMove = moves[0]
+                    
+                #based on the decisions you have made above (given the opponents throw), throw the move that makes the most sense   
+                return moves[calculatedMove]
+
+       #this all needs to be fixed     
+        elif self == p2:
+            if p1Wins > p2Wins:
+                rounds = rounds + 1
+                if p2LastMove.name() == "Rock":
+                    #Play what would have beaten Rock (Spock or Paper)
+                    #Generate a random number between 1 and 4, save it in the variable randomInteger
+                    randomInteger = random.randint(1, 4)
+
+                    if randomInteger <= 2:
+                        return moves[4]
+                    else:
+                        return moves[1]
+            
+                elif p2LastMove.name() == "Paper":
+                    print ("you are in the p1LastMove == paper part")
+                    #Play would would have beaten Paper (Scissors or Lizard)
+                    #Generate a random number between 1 and 4, save it in the variable randomInteger
+                    randomInteger = random.randint(1, 4)
+
+                    if randomInteger <= 2:
+                        return moves[3]
+                    else:
+                        return moves[2]
+           
+                elif p2LastMove.name() == "Scissors":
+                    #Play what would have beaten Scissors (Rock or Spock)
+                    #Generate a random number between 1 and 4, save it in the variable randomInteger
+                    randomInteger = random.randint(1, 4)
+
+                    if randomInteger <= 2:
+                        return moves[0]
+                    else:
+                        return moves[4]
+                    
+                elif p2LastMove.name() == "Lizard":
+                    #Play what would have beaten Lizard (Rock or Scissors)
+                    #Generate a random number between 1 and 4, save it in the variable randomInteger
+                    randomInteger = random.randint(1, 4)
+
+                    if randomInteger <= 2:
+                        return moves[2]
+                    else:
+                        return moves[0]   
+            
+                elif p2LastMove.name() == "Spock":
+                    #Play what would have beaten Spock (Paper or Lizard)
+                    #Generate a random number between 1 and 4, save it in the variable randomInteger
+                    randomInteger = random.randint(1, 4)
+
+                    if randomInteger <= 2:
+                        return moves[0]
+                    else:
+                        return moves[1]             
+   
+        #Play randomly when not down
+        rounds = rounds + 1
+        randomMove = random.randint(0, 4)
+        return moves[randomMove]
 
 
 """This stuff will eventually go in main!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!"""                  
@@ -452,76 +625,58 @@ p2IterativeCounter = 0
 global p1
 global p2
 
-global p1sOpponentsMove
-global p2sOpponentsMove
+global p1sOpponentsLastMove
+global p2sOpponentsLastMove
+
+global p1Move
+global p2Move
+
+
+global rounds
+
+p1Wins = 0
+p2Wins = 0
+rounds = 0
 
 p1 = None
 p2 = None
-p1sOpponentsMove = None
-p2sOpponentsMove = None
+p1sOpponentsLastMove = None
+p2sOpponentsLastMove = None
 
-p1 = IterativeBot('Iterative Bot')
-p2 = LastPlayBot('Last Play Bot')
-p1Move = p1.play()
-p2Move = p2.play()
-p1sOpponentsMove = p2Move
-p2sOpponentsMove = p1Move
-print ("p1 played " + p1Move.name())
-print ("p2 played " + p2Move.name())
-print (p1Move.compareTo(p2Move))
-print("______________________________")
+for x in range (0, 5):
+    p1 = MyBot('MyBot')
+    p2 = Human('Human')
+    p1Move = p1.play()
+    p2Move = p2.play()
+    p1sOpponentsLastMove = p2Move
+    p2sOpponentsLastMove = p1Move
+    print ("p1 played " + p1Move.name())
+    print ("p2 played " + p2Move.name())
+    outcome = p1Move.compareTo(p2Move)
+    print (outcome[0])
+    print (outcome[1])
+    if outcome[1] == "Win":
+        p1Wins = p1Wins + 1
+    elif outcome[1] == "Lose":
+        p2Wins = p2Wins + 1
+    print("______________________________")
 
-p1 = LastPlayBot('Last Play Bot')
-p2 = LastPlayBot('Last Play Bot')
-p1Move = p1.play()
-p2Move = p2.play()
-p1sOpponentsMove = p2Move
-p2sOpponentsMove = p1Move
-print ("p1 played " + p1Move.name())
-print ("p2 played " + p2Move.name())
-print (p1Move.compareTo(p2Move))
-print("______________________________")
 
-p1 = LastPlayBot('Last Play Bot')
-p2 = LastPlayBot('Last Play Bot')
-p1Move = p1.play()
-p2Move = p2.play()
-p1sOpponentsMove = p2Move
-p2sOpponentsMove = p1Move
-print ("p1 played " + p1Move.name())
-print ("p2 played " + p2Move.name())
-print (p1Move.compareTo(p2Move))
-print("______________________________")
 
-p1 = LastPlayBot('Last Play Bot')
-p2 = LastPlayBot('Last Play Bot')
-p1Move = p1.play()
-p2Move = p2.play()
-p1sOpponentsMove = p2Move
-p2sOpponentsMove = p1Move
-print ("p1 played " + p1Move.name())
-print ("p2 played " + p2Move.name())
-print (p1Move.compareTo(p2Move))
-print("______________________________")
+print ("# rounds: " + str(rounds))
+print ("p1 wins = " + str(p1Wins))
+print ("p2 wins = " + str(p2Wins))
 
-p1 = LastPlayBot('Last Play Bot')
-p2 = LastPlayBot('Last Play Bot')
-p1Move = p1.play()
-p2Move = p2.play()
-p1sOpponentsMove = p2Move
-p2sOpponentsMove = p1Move
-print ("p1 played " + p1Move.name())
-print ("p2 played " + p2Move.name())
-print (p1Move.compareTo(p2Move))
-print("______________________________")
+if p1Wins == p2Wins:
+    print("Game was a draw")
+elif p1Wins > p2Wins:
+    print("Player 1 emerged victorious")
+else:
+    print("Player 2 emerged victorious")    
 
-p1 = LastPlayBot('Last Play Bot')
-p2 = LastPlayBot('Last Play Bot')
-p1Move = p1.play()
-p2Move = p2.play()
-p1sOpponentsMove = p2Move
-p2sOpponentsMove = p1Move
-print ("p1 played " + p1Move.name())
-print ("p2 played " + p2Move.name())
-print (p1Move.compareTo(p2Move))
-print("______________________________")
+
+
+
+
+
+
