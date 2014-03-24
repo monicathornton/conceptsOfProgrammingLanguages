@@ -289,61 +289,35 @@ class IterativeBot (Player):
         global p1
         global p2
 
-        #Allows for the case that both p1 and p2 are Iterative Bot players, so the correct global variables are updated        
-        if p1.name() == "Iterative Bot" and p2.name() == "Iterative Bot":
-        #If they will both need to be updated, this is for the case in which p1 is self    
-            if self == p1:
-                #location is a local variable to keep track of where we are in the moves list, we set it equal to the value in p1IterativeCounter
-                location = p1IterativeCounter
-
-                #If location is greater than 4 (because we have 5 moves total and moves is 0 indexed), we start back at the beginning of the list
-                if location > 4:
-                    location = 0
-                    #increments p1IterativeCounter, so the next time we loop through it - p1IterativeCounter is in the right place
-                    p1IterativeCounter = location + 1
-                else:
-                    #If location is not greater than 4, update to the next move in the moves list
-                    p1IterativeCounter = p1IterativeCounter + 1
-
-            #If they will both need to be updated, this is for the case in which p2 is self                    
-            elif self == p2:
-                #location is a local variable to keep track of where we are in the moves list, we set it equal to the value in p2IterativeCounter
-                location = p2IterativeCounter
-
-                #If location is greater than 4 (because we have 5 moves total and moves is 0 indexed), we start back at the beginning of the list
-                if location > 4:
-                    location = p2IterativeCounter
-                    location = 0
-                    #increments p1IterativeCounter, so the next time we loop through it - p2IterativeCounter is in the right place
-                    p2IterativeCounter = location + 1
-                else:
-                    #If location is not greater than 4, update to the next move in the moves list
-                    p2IterativeCounter = p2IterativeCounter + 1
-                    
-        #Allows for the case that just p1 is an Iterative Bot player, so the correct global variables are updated                      
-        elif p1.name() == "Iterative Bot" and p2.name() != "Iterative Bot":
+        #Checks if self is p1 or p2 - to update the correct global variables
+        if self == p1:
+            
+            #location is a local variable to keep track of where we are in the moves list, we set it equal to the value in p1IterativeCounter
             location = p1IterativeCounter
+
+            #If location is greater than 4 (because we have 5 moves total and moves is 0 indexed), we start back at the beginning of the list
             if location > 4:
-                #Sets the location back to 0 (the beginning of the list)
                 location = 0
                 #increments p1IterativeCounter, so the next time we loop through it - p1IterativeCounter is in the right place
                 p1IterativeCounter = location + 1
             else:
-                #If location is not greater than 4, we increment the iterative counter, but leave location untouched
+                #If location is not greater than 4, update to the next move in the moves list
                 p1IterativeCounter = p1IterativeCounter + 1
-        #Allows for the case that just p2 is an Iterative Bot player, so the correct global variables are updated        
-        elif p2.name() == "Iterative Bot" and p1.name() != "Iterative Bot":
+                  
+        elif self == p2:
+            #location is a local variable to keep track of where we are in the moves list, we set it equal to the value in p2IterativeCounter
             location = p2IterativeCounter
-            #If location is greater than 4 (because we have 5 moves total and moves is 0 indexed), we start back at the beginning of the list            
+
+            #If location is greater than 4 (because we have 5 moves total and moves is 0 indexed), we start back at the beginning of the list
             if location > 4:
-                #Sets the location back to 0 (the beginning of the list)
+                location = p2IterativeCounter
                 location = 0
                 #increments p2IterativeCounter, so the next time we loop through it - p2IterativeCounter is in the right place
                 p2IterativeCounter = location + 1
             else:
-                #If location is not greater than 4, we increment the iterative counter, but leave location untouched
+                #If location is not greater than 4, update to the next move in the moves list
                 p2IterativeCounter = p2IterativeCounter + 1
-        
+                            
         #Return the appropriate member of the moves list to the calling function
         return moves[location]            
                
@@ -352,11 +326,6 @@ class LastPlayBot (Player):
     #The name instance variable from Player is overriden, and its value set to LastPlayBot
     _name = "Last Play Bot"
 
-    #A global variable to store the opponent's last move - initialized to None in case opponent has not moved yet
-    global opponentMove
-    opponentMove = None
-
-
     #Constructor to build LastPlayBot players
     def __init__(self,name):
         super(LastPlayBot,self).__init__("Last Play Bot")
@@ -364,18 +333,48 @@ class LastPlayBot (Player):
     """Overrides the play method inherited from Player, with the Last Play move strategy implemented. In this strategy, the initial move is chosen randomly,
     and after that moves are picked based on the last move played by the opponent."""
     def play(self):
-        #If first move of round (ergo, opponent has not moved yet), play random move
-        if opponentMove is None:
+        #Specifies that the below variables are global, used to specify/differentiate between p1 and p2        
+        global p1
+        global p2
 
-            #Generate a random number between 0 and 4, save it in the variable randomMove
-            randomMove = random.randint(0, 4)
+        #A global variable to store the opponent's last move, used to specify/differentiate between p1 and p2
+        global p1sOpponentsMove
+        global p2sOpponentsMove
+
+        #Checks if self is p1 or p2 - to update the correct global variables
+        if p1 == self:
+            #opponentMove is a local variable to keep track of what your opponent played
+            opponentMove = p1sOpponentsMove
+
+            #If first move of round (ergo, opponent has not moved yet), play random move
+            if opponentMove is None:
+
+                #Generate a random number between 0 and 4, save it in the variable randomMove
+                randomMove = random.randint(0, 4)
             
-            #Use randomMove variable to get a move from the moves list
-            return moves[randomMove]
+                #Use randomMove variable to get a move from the moves list
+                return moves[randomMove]
         
-        else:
-            #If your opponent has already moved, play their move from last turn for this turn
-            return opponentMove
+            else:
+                #If your opponent has already moved, play their move from last turn for this turn
+                return opponentMove
+
+        elif p2 == self:
+            #opponentMove is a local variable to keep track of what your opponent played
+            opponentMove = p2sOpponentsMove
+
+            #If first move of round (ergo, opponent has not moved yet), play random move
+            if opponentMove is None:
+
+                #Generate a random number between 0 and 4, save it in the variable randomMove
+                randomMove = random.randint(0, 4)
+            
+                #Use randomMove variable to get a move from the moves list
+                return moves[randomMove]
+        
+            else:
+                #If your opponent has already moved, play their move from last turn for this turn
+                return opponentMove
 
 """A subclass to represent the Human player, in which the series of moves are determined by the Human player."""
 class Human (Player):
@@ -427,8 +426,7 @@ class MyBot (Player):
 
     
     """Overrides the play method inherited from Player, with the Human player picking the moves."""    
-    def play(self):
-            
+    def play(self):            
         return moves[0]  
 
 
@@ -438,11 +436,11 @@ class MyBot (Player):
 
 
 
-                  
+
+"""This stuff will eventually go in main!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!"""                  
 #Calls the moves list function, so the moves are instantiated and stored in a list
 moves_list()
 
-#NOTE TO MONICA --------------------------------------------------------- SHOULD REALLY DO P1 AND P2 AS SEPARATE ITERATIVE BOTS!!!!!!!!!!!!!!!!!
 #A global variable to keep track of the location in the moves list, for use with the Iterative Bot
 global p1IterativeCounter
 global p2IterativeCounter
@@ -454,46 +452,76 @@ p2IterativeCounter = 0
 global p1
 global p2
 
-p1 = IterativeBot('Iterative Bot')
-p2 = IterativeBot('Iterative Bot')
-p1move = p1.play()
-p2move = p2.play()
-print (p1move.compareTo(p2move))
-opponentMove = p2move
+global p1sOpponentsMove
+global p2sOpponentsMove
+
+p1 = None
+p2 = None
+p1sOpponentsMove = None
+p2sOpponentsMove = None
 
 p1 = IterativeBot('Iterative Bot')
-p2 = IterativeBot('Iterative Bot')
-p1move = p1.play()
-p2move = p2.play()
-print (p1move.compareTo(p2move))
-opponentMove = p2move
+p2 = LastPlayBot('Last Play Bot')
+p1Move = p1.play()
+p2Move = p2.play()
+p1sOpponentsMove = p2Move
+p2sOpponentsMove = p1Move
+print ("p1 played " + p1Move.name())
+print ("p2 played " + p2Move.name())
+print (p1Move.compareTo(p2Move))
+print("______________________________")
 
-p1 = IterativeBot('Iterative Bot')
-p2 = IterativeBot('Iterative Bot')
-p1move = p1.play()
-p2move = p2.play()
-print (p1move.compareTo(p2move))
-opponentMove = p2move
+p1 = LastPlayBot('Last Play Bot')
+p2 = LastPlayBot('Last Play Bot')
+p1Move = p1.play()
+p2Move = p2.play()
+p1sOpponentsMove = p2Move
+p2sOpponentsMove = p1Move
+print ("p1 played " + p1Move.name())
+print ("p2 played " + p2Move.name())
+print (p1Move.compareTo(p2Move))
+print("______________________________")
 
-p1 = IterativeBot('Iterative Bot')
-p2 = IterativeBot('Iterative Bot')
-p1move = p1.play()
-p2move = p2.play()
-print (p1move.compareTo(p2move))
-opponentMove = p2move
+p1 = LastPlayBot('Last Play Bot')
+p2 = LastPlayBot('Last Play Bot')
+p1Move = p1.play()
+p2Move = p2.play()
+p1sOpponentsMove = p2Move
+p2sOpponentsMove = p1Move
+print ("p1 played " + p1Move.name())
+print ("p2 played " + p2Move.name())
+print (p1Move.compareTo(p2Move))
+print("______________________________")
 
-p1 = IterativeBot('Iterative Bot')
-p2 = IterativeBot('Iterative Bot')
-p1move = p1.play()
-p2move = p2.play()
-print (p1move.compareTo(p2move))
-opponentMove = p2move
+p1 = LastPlayBot('Last Play Bot')
+p2 = LastPlayBot('Last Play Bot')
+p1Move = p1.play()
+p2Move = p2.play()
+p1sOpponentsMove = p2Move
+p2sOpponentsMove = p1Move
+print ("p1 played " + p1Move.name())
+print ("p2 played " + p2Move.name())
+print (p1Move.compareTo(p2Move))
+print("______________________________")
 
+p1 = LastPlayBot('Last Play Bot')
+p2 = LastPlayBot('Last Play Bot')
+p1Move = p1.play()
+p2Move = p2.play()
+p1sOpponentsMove = p2Move
+p2sOpponentsMove = p1Move
+print ("p1 played " + p1Move.name())
+print ("p2 played " + p2Move.name())
+print (p1Move.compareTo(p2Move))
+print("______________________________")
 
-
-
-
-
-
-
-
+p1 = LastPlayBot('Last Play Bot')
+p2 = LastPlayBot('Last Play Bot')
+p1Move = p1.play()
+p2Move = p2.play()
+p1sOpponentsMove = p2Move
+p2sOpponentsMove = p1Move
+print ("p1 played " + p1Move.name())
+print ("p2 played " + p2Move.name())
+print (p1Move.compareTo(p2Move))
+print("______________________________")
