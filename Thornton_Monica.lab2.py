@@ -63,7 +63,7 @@ class MainClass:
         rounds = 1
 
         #Prints a menu with all of the choices for the user to select from
-        print("Welcome to Rock, Paper, Scissors, Lizard, Spock, implemented by " + myName + "\n")
+        print("\nWelcome to Rock, Paper, Scissors, Lizard, Spock, implemented by " + myName + "\n")
         print("Please choose two players: ")        
         print("   (1) Human")
         print("   (2) Stupid Bot")
@@ -647,11 +647,14 @@ class MyBot (Player):
             #generates a random integer, so we can choose from Paper, Spock and Lizard
             randomInteger = random.randint(1, 4)
 
-            if randomInteger < 2:
+            if randomInteger == 1:
+                #return Spock
                 return moves[4]
             elif randomInteger == 2:
+                #return Rock
                 return moves[0]
             else:
+                #return Paper most often (if our randomInteger is 3 or 4)
                 return moves[1]
 
         """When they are losing, people are more likely to (subconsciously) play the move that would have beaten their last move. Therefore, if the other player
@@ -814,7 +817,6 @@ class MyBot (Player):
         randomMove = random.randint(0, 4)
         return moves[randomMove]
               
-
 """Call the main class, in order to play a game of Paper, Rock, Scissors, Lizard, Spock with the specified characters"""
 mc = MainClass
 mc.main('Main Class')
