@@ -65,12 +65,34 @@
 (define (set? lst)
   ;Allows us to trace the function set?;
   (trace set?)
-  
-  (cond 
+  (cond
        ((null? lst) #t)
-  )
-   
+       ((= 1 (length lst)) #t)
+       (else (for/list ([i lst])
+             (* i i)))
+             ;(member? i lst)))
+  ))
   
-  ((member? (car lst) (cdr lst)))
-     )
-  )
+
+  
+  
+     
+     
+
+  
+       
+  
+
+  
+  
+  
+  
+  
+  
+  
+    
+
+
+ 
+
+  

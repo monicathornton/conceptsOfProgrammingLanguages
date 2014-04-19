@@ -1,0 +1,66 @@
+;Tells DrRacket the language we are using (Scheme);
+#lang scheme
+
+;Tells DrRacket that we want to enable tracing;
+(require racket/trace)
+
+#|
+ ######################################## 
+ #  CSCI 305 - Programming Lab #3		
+ #										
+ #  Monica Thornton			
+ #  monicasuethornton@gmail.com			
+ #
+ # A program that contains a variety of different functions, 
+ # used to learn and demonstrate functional programming. 
+ #  
+ ######################################## 
+|#
+
+
+#|Defines a function named f that given a list of numbers
+  (either integer or float) will increment that number by 1.
+  The function takes as its argument a list named lst.
+|#
+(define (f lst)
+  ;Allows us to trace the function f;
+  ;(trace f);
+  
+  ;Checks if lst is null (in other words, have we processed all values in lst yet?);
+  (if (null? lst)
+      ;If lst is empty, creates an empty list;
+      ' ()
+      #| Else, if lst is not empty - constructs a new list (via a recursive call to f), which contains the values in 
+         the old list incremented by 1.|#
+      (cons (+ 1 (car lst)) (f(cdr lst)))))
+
+(define (member? e lst)
+  ;Allows us to trace the function member?;
+  (trace member?)
+  
+  (cond (null? lst
+           (display "list is null")
+            #f)
+        (equal? e (car lst)
+            (display "that was the first item")    
+            #t))    
+      ; (display "taking second branch")
+      ; (action2))
+      ;(test3
+      ; (display "taking third branch")
+      ; (action3))
+      ;(else
+      ; (display "taking fourth (default) branch")
+      ; (action4)))
+  )
+  
+  #|(cond(null? lst)
+       #f)
+
+  (if (null? lst)
+      #f)
+  
+  (if (equal? (car lst) e)
+      #t
+    
+  else (member?(cdr lst))))|#
