@@ -61,23 +61,66 @@
      )
   )
 
-
+#|Defines a function named set? that given a list
+  (either chars, strings, ints or floats) will determine if the list is
+  a well formed set - a set with no duplicates. The function takes as its 
+  argument a list named lst.
+|#
 (define (set? lst)
   ;Allows us to trace the function set?;
-  (trace set?)
+  ;(trace set?);
   
+  ;the following is a series of conditionals to determine if lst is a well-formed set;
   (cond
+       ;Returns true if lst is null, because a null list contains no duplicates; 
        ((null? lst) #t)
+       ;Returns true if lst is just 1 element long, because it could not have any duplicates; 
        ((= 1 (length lst)) #t)      
-       (else 
-        ;if > 1, compare elements;
-        ;need to make repeat, terminate at appropriate time;
-        ;switch, so #t is false and vice versa;
-
-        (not (member? (car lst) (cdr lst))))
-        
+       ;If lst is greater than 1, we need to check for duplicates;
+       (else  
+        #|Because the duplicate value (if it exists) could appear anywhere in the 
+          list, we loop through the list to check for duplicate values. Our member?
+          function (used to check for duplicate entries) requires a element to check
+          for and a list of elements to check - so we run the check with each element 
+          of the list.
+        |#
+          ;Sets an iterator i (initialized to 0, to use in iterating through the list;
+          (let loop ([i 0])
+           
+          ;Checks if it is our first time through the list (that is, if i = 0);  
+          (when (> i 0) 
+              ;If it is not the first time through the list, removes the first element (which has already been checked)
+              (set! lst (cdr lst)))
+            
+            #|Checks if there are elements remaining in the list (if there are not, entire list has been searched for duplicates).
+              Once there are no elements remaining in the list, we break out of the loop.
+            |#
+            (unless (equal? 0 (+ 1(length lst)))
+                    ;Series of conditions to test for duplicate values in the list;
+                    (cond
+                         ;If the list is null, return true - we have not found a duplicate in the list;
+                         ((null? lst) #t)
+                      
+                         #|Calls the member? function above to determine if the first element of the list is present
+                           in the remaining part of the list. If it is, and the member? function returns true - we 
+                           return a value of false, because that means we have found a duplicate entry.
+                         |#
+                         ((equal? (member? (car lst)(cdr lst)) #t) #f)
+                         
+                         #|If we have not found a duplicate entry using the first value in the list, we repeat the loop
+                           because that is no guarantee that a duplicate entry does not occur later in the list. We increment
+                           i and run the loop again.
+                         |#
+                         (else (loop (+ i 1)))
+                      )
+              )
+            )
+          )
+       )
   )
-)
+      
+  
+
   
 
   
