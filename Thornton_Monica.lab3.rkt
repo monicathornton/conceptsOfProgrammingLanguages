@@ -65,13 +65,19 @@
 (define (set? lst)
   ;Allows us to trace the function set?;
   (trace set?)
+  
   (cond
        ((null? lst) #t)
-       ((= 1 (length lst)) #t)
-       (else (for/list ([i lst])
-             (* i i)))
-             ;(member? i lst)))
-  ))
+       ((= 1 (length lst)) #t)      
+       (else 
+        ;if > 1, compare elements;
+        ;need to make repeat, terminate at appropriate time;
+        ;switch, so #t is false and vice versa;
+
+        (not (member? (car lst) (cdr lst))))
+        
+  )
+)
   
 
   
