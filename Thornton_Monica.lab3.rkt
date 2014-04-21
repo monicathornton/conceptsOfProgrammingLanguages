@@ -18,8 +18,7 @@
 |#
 
 
-#|Defines a function named f that given a list of numbers
-  (either integer or float) will increment that number by 1.
+#|Defines a function named f that given a list of numbers (either integer or float) will increment that number by 1.
   The function takes as its argument a list named lst.
 |#
 (define (f lst)
@@ -34,10 +33,8 @@
          the old list incremented by 1.|#
       (cons (+ 1 (car lst)) (f(cdr lst)))))
 
-#|Defines a function named member? that given a list
-  will search the list to determine if an element e 
-  (provided by the user) is a part of that list.
-  The function takes as its argument the target value e, 
+#|Defines a function named member? that given a list will search the list to determine if an element e 
+  (provided by the user) is a part of that list. The function takes as its argument the target value e, 
   and the list to be searched lst.
 |#
 (define (member? e lst)
@@ -119,24 +116,88 @@
        )
   )
       
+  #|Defines a function that takes two lists as input, and returns a list that represents the union of the two lists. 
+    For the purpose of this function, the union function returns a list that is the set of all distinct elements
+    in the collection. Any element that is in lst1, lst2 or in list 1 and 2 appears in the final list.
+  |#
+(define (union lst1 lst2)
+  ;Allows us to trace the function union;
+  ;(trace union);
   
-
+  #|First makes sure that both lst1 and lst2 are well-formed sets (that is, they contain
+    no duplicates). By removing the duplicates in these sets, we can insure that we can take
+    the union of the two lists without automatically introducing repeated elements.
+  |#
+  (cond
+    ;If lst1 is not a well-formed set, remove duplicates;
+    ((equal? (set? lst1) #f) (set! lst1 (remove-duplicates lst1)))
+    ;If lst2 is not a well-formed set, remove duplicates;
+    ((equal? (set? lst2) #f) (set! lst2 (remove-duplicates lst2)))
+   )
   
-
+  #|Once we have established that lst1 and lst2 are both well-formed sets - the following series of 
+    conditions allow us to build the union of the two lists lst1 and lst2, and return a single list
+    representing the union.
+  |#
+  (cond
+    ;Checks if the first list is empty, if so, just returns the second list;
+    ((null? lst1) lst2)
+    
+    ;Checks if the second list is empty, if so, just returns the first list;
+    ((null? lst2) lst1)
+    
+     #|Checks if the first item of lst1 is present in lst2. If so, recursively calls the 
+       union function on the remaining elements in lst1 and lst2. 
+     |#
+    ((member? (car lst1) lst2) (union (cdr lst1) lst2))
+    
+     #|If the first element in lst1 is not present in lst2, adds it to the list and recursively
+       calls the union function on the remainder of the elements in lst1 and lst2.
+     |#
+    (else (cons (car lst1) (union (cdr lst1) lst2)))
+    )
+  )
   
+  #|Defines a function that takes two lists as input, and returns a list that represents the intersection of the two lists. 
+    For the purpose of this function, the union function returns a list that is the set of all distinct elements
+    in the collection. Any element that is in lst1, lst2 or in list 1 and 2 appears in the final list.
+  |#  
+(define (intersect lst1 lst2)
+  ;Allows us to trace the function intersect;
+  (trace intersect)
   
-     
-     
-
+  #|First makes sure that both lst1 and lst2 are well-formed sets (that is, they contain
+    no duplicates) to prevent a single element from appearing multiple times in the intersection.
+  |#
+  (cond
+    ;If lst1 is not a well-formed set, remove duplicates;
+    ((equal? (set? lst1) #f) (set! lst1 (remove-duplicates lst1)))
+    ;If lst2 is not a well-formed set, remove duplicates;
+    ((equal? (set? lst2) #f) (set! lst2 (remove-duplicates lst2)))
+   )
   
-       
-  
-
-  
-  
-  
-  
-  
+  #|Once we have established that lst1 and lst2 are both well-formed sets - the following series of 
+    conditions allow us to build the intersection of the two lists lst1 and lst2, and return a single list
+    representing the intersection.
+  |#
+  (cond
+    ;If lst1 is null, the intersection with lst2 must also be null (since there can be no shared elements);
+    ((null? lst1) '())
+    
+    ;If lst2 is null, the intersection with lst1 must also be null (since there can be no shared elements;    
+    ((null? lst2) '())
+    
+     #|Checks if the first item of lst1 is present in lst2. If so, adds that element to the list and recursively calls the 
+       union function on the remaining elements in lst1 and lst2. 
+     |#
+    ((member? (car lst1) lst2) (cons (car lst1) (intersect (cdr lst1) lst2)))
+    
+     #|If the first element in lst1 is not present in lst2, recursively
+       calls the union function on the remainder of the elements in lst1 and lst2.
+     |#
+    (else (intersect (cdr lst1) lst2))
+  )
+)
   
   
     
