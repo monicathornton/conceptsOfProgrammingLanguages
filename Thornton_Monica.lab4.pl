@@ -90,22 +90,39 @@ grandmother(G,X):- grandparent(G,X), female(G).
 % grandchild (or grandchildren) will be returned.
 grandchild(C,G):- grandparent(G,C).
 
-% Set of rules to define an ancestor of (D). The first rule defines the
-% parent (A) of (D) as an ancestor of D. The second rule gets ancestors
-% of D in generations preceding their parents by first looking at their
-% parent's parents, and then the ancestors of those parents (through
-% recursion).
-ancestor(A,D):- parent(A,D).
-ancestor(A,D):- parent(A,X), ancestor(X,D).
+% Set of rules to define an ancestor of (D), given from most remote to
+% most immediate. The first rule gets ancestors of D in generations
+% preceding their parents by first looking at their parent's parents,
+% and then the ancestors of those parents (through recursion). The second rule
+% comes into play when there are no more ancestors, and it defines the
+% ancestor (A) of (D) as an parent of D.
 
+ancestor(A,D):- parent(A,X), ancestor(X,D).
+ancestor(A,D):- parent(A,D).
+
+% Rule that defines a descendant (D) in terms of D's ancestors.
 descendant(D,A):- ancestor(A,D).
 
-older(O,Y):- born(O,X), born(Y,Z), (( X < Z) -> true ; false).
+% Rule that compares the birth year for two people (O) and (Y). If the
+% birth year (X) of the first person (O) happens before the birth year
+% (Z) of the second person, their name (or true, if the name is
+% provided) is returned to indicate that they are older. If the second
+% person (Y) is older, than false is returned.
+older(O,Y):- born(O,X), born(Y,Z),((X < Z) -> true ; false).
 
-younger(O,Y):- born(O,X), born(Y,Z), (( X < Z) -> false ; true).
+% Rule that compares the birth year for two people (O) and (Y). If the
+% birth year (X) of the first person (O) happens before the birth year
+% (Z) of the second person, false is returned to indicate that they are
+% not younger. If the second person (Y) is younger, than true is
+% returned.
+younger(O,Y):- born(O,X), born(Y,Z), ((X < Z) -> false ; true).
 
-regentWhenBorn(R,B):- born(B,Y), reigned(R, S, E), S=<Y, Y=<E.
-
+% Rule to determine who the regent (R) was when person (B) was born.
+% This is done by first getting the birth year of person (B), and then
+% comparing it to the start (S) and end dates (E) of various regents. If
+% they were born between the start and end date (inclusive) of the
+% regent's reign, then that regent was reigning when they were born.
+regentWhenBorn(R,B):- born(B,Y), reigned(R, S, E), S=<Y, Y=<E, !.
 
 
 
